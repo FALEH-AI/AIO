@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Trigger status | AL3MFALEH</title>
+    <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0a0a0b; color: white; display: flex; justify-content: center; padding: 20px; }
+    .card { background: #16161e; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 480px; position: relative; border: 1px solid #7aa2f7; }
+    h2 { text-align: center; color: #7aa2f7; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+    label { display: block; margin-top: 15px; font-size: 14px; color: #a9b1d6; }
+    input, select, button, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #24283b; box-sizing: border-box; }
+    input, select, textarea { background-color: #1a1b26; color: white; font-family: 'Consolas', monospace; }
+    .btn-send { background-color: #7aa2f7; color: #0a0a0b; margin-top: 20px; font-size: 16px; font-weight: bold; }
+    .btn-send:hover { background-color: #89ddff; }
+    .btn-settings { background-color: #24283b; color: #7aa2f7; font-size: 11px; padding: 6px 12px; border: 1px solid #7aa2f7; }
+    .footer-rights { border-top: 1px solid #24283b; color: #7aa2f7; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header-area">
+        <button class="btn-settings" onclick="editWebhooksPopup()">⚙️ إعدادات الويب هوك</button>
+    </div>
+    <h2>🚀 Trigger 𝖲tatus</h2>
+    
+    <label>كود التريجر:</label>
+    <textarea id="triggerCode" rows="5" placeholder="ألصق كود FiveM هنا..."></textarea>
+
+    <label>حالة التريجر:</label>
+    <select id="triggerStatus">
+        <option value="working">شغال ✅</option>
+        <option value="broken">معطل ❌</option>
+    </select>
+
+    <button class="btn-send" id="sendBtn" onclick="sendToDiscord()">إرسال التحديث</button>
+
+    <p id="responseMsg"></p>
+
+    <div class="footer-rights">
+        DEVELOPED BY <span>AL3MFALEH</span> © 2026
+    </div>
+</div>
+
+<script>
+    // الروابط الافتراضية التي زودتني بها
+    const defaultMain = "https://discord.com/api/webhooks/1457963238472814637/L5310W7JVYdSFjvnSAUAQt7tyAmcGmPBkv3v50BSI3OZ4-cM-tXqzBiBdcUhReTC37Hc";
+    const defaultEmergency = "https://discord.com/api/webhooks/1457965562947829865/Raj3glMZUKFCjWH-dIEH6iSP4tUpRh-tjvrRa4ohwJ20cNOIkylvtwRHLExEjjBs1zYR";
+
+    // تفعيل الروابط عند أول تشغيل للمتصفح
+    window.onload = function() {
+        if (!localStorage.getItem('webhook_main')) {
+            localStorage.setItem('webhook_main', defaultMain);
+        }
+        if (!localStorage.getItem('webhook_emergency')) {
+            localStorage.setItem('webhook_emergency', defaultEmergency);
+        }
+    };
+
+    function editWebhooksPopup() {
+        const currentW1 = localStorage.getItem('webhook_main') || defaultMain;
+        const currentW2 = localStorage.getItem('webhook_emergency') || defaultEmergency;
+
+        const w1 = prompt("1. رابط الويب هوك (للحالة: شغال):", currentW1);
+        if (w1 !== null) {
+            localStorage.setItem('webhook_main', w1);
+            const w2 = prompt("2. رابط ويب هوك (للحالة: معطل):", currentW2);
+            if (w2 !== null) {
+                localStorage.setItem('webhook_emergency', w2);
+                showStatus("✅ تم تحديث الروابط بنجاح", "#7289da");
+            }
+        }
+    }
+
+    function sendToDiscord() {
+        const code = document.getElementById('triggerCode').value;
+        const statusValue = document.getElementById('triggerStatus').value;
+        const statusText = document.getElementById('triggerStatus').options[document.getElementById('triggerStatus').selectedIndex].text;
+
+        let targetWebhook = statusValue === "working" ? localStorage.getItem('webhook_main') : localStorage.getItem('webhook_emergency');
+
+        if (!targetWebhook) { alert("تأكد من إعدادات الويب هوك ⚙️"); return; }
+        if (!code) { alert("يرجى إدخال الكود أولاً!"); return; }
+
+        const payload = {
+            embeds: [{
+                title: statusValue === "working" ? "✅ Trigger Status: Working" : "⚠️ Trigger Status: Broken",
+                color: statusValue === "working" ? 3066993 : 15158332,
+                fields: [
+                    { name: "الحالة المختارة", value: `**${statusText}**`, inline: false },
+                    { name: "كود النسخ:", value: "```lua\n" + code + "\n```", inline: false }
+                ],
+                footer: { text: "System Developed by AL3MFALEH | Trigger Status" },
+                timestamp: new Date()
+            }]
+        };
+
+        const btn = document.getElementById('sendBtn');
+        btn.innerText = "جاري الإرسال...";
+        btn.disabled = true;
+
+        fetch(targetWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error();
+            showStatus(`✅ تم الإرسال بنجاح بواسطة AL3MFALEH`, "#43b581");
+        })
+        .catch(() => alert("فشل في الإرسال!"))
+        .finally(() => {
+            btn.innerText = "إرسال التحديث";
+            btn.disabled = false;
+        });
+    }
+
+    function showStatus(text, color) {
+        const msg = document.getElementById('responseMsg');
+        msg.innerText = text;
+        msg.style.color = color;
+        setTimeout(() => { msg.innerText = ""; }, 4000);
+    }
+</script>
+
+</body>
+</html>

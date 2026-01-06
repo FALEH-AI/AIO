@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>AL3MFALEH | FiveM Dev Tool 🚀</title>
+    <style>
+        :root { --bg: #0a0a0b; --card: #1a1b26; --text: #a9b1d6; --accent: #7aa2f7; --green: #9ece6a; --red: #f7768e; --orange: #ff9e64; --info: #bb9af7; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .main-layout { display: flex; gap: 20px; width: 100%; max-width: 1200px; align-items: flex-start; }
+        .right-side { flex: 1.5; display: flex; flex-direction: column; gap: 20px; }
+        .left-side { flex: 1; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 20px; }
+        .container { background-color: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); border: 1px solid #24283b; position: relative; }
+        h2 { text-align: center; color: var(--accent); margin: 0 0 20px 0; border-bottom: 2px solid #24283b; padding-bottom: 10px; font-size: 1.2rem; }
+        .credits { text-align: center; font-size: 0.7rem; color: #565f89; margin-top: 15px; letter-spacing: 1px; }
+        .credits b { color: var(--accent); }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #565f89; font-size: 0.8rem; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #24283b; background-color: #24283b; color: #c0caf5; box-sizing: border-box; }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .row div { flex: 1; }
+        .switch-box { background: #16161e; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #24283b; }
+        .flex-label { display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
+        
+        .file-item { display: flex; justify-content: space-between; align-items: center; background: #24283b; padding: 10px; margin-bottom: 8px; border-radius: 6px; border-right: 3px solid var(--orange); gap: 10px; }
+        .file-name { font-size: 0.8rem; color: var(--text); word-break: break-all; flex: 1; }
+
+        .trigger-item { background-color: #24283b; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
+        .item-header { display: flex; justify-content: space-between; align-items: center; }
+        .info-panel { background: #16161e; padding: 10px; border-radius: 6px; display: none; margin-top: 10px; font-size: 0.75rem; border: 1px solid #414868; color: #9ece6a; white-space: pre-wrap; font-family: monospace; }
+        .actions { display: flex; gap: 5px; }
+        .btn-copy { background-color: var(--orange); color: #1a1b26; }
+        .btn-send { background-color: var(--green); color: #1a1b26; }
+        .btn-del { background-color: var(--red); color: #ffffff; }
+        .disabled { opacity: 0.3; pointer-events: none; }
+    </style>
+</head>
+<body onload="initApp()">
+
+<div class="main-layout">
+    <div class="right-side">
+        <div class="container">
+            <h2>🛠️ مولد التريجرات | AL3MFALEH</h2>
+            <div class="row">
+                <div style="flex:2"><label>اسم التريجر:</label><input type="text" id="eventName" placeholder="esx:giveInventoryItem"></div>
+                <div><label>المعطيات:</label><input type="text" id="params" placeholder="id, 'bread', 1"></div>
+            </div>
+
+            <div class="switch-box">
+                <div class="flex-label">
+                    <label style="color:var(--green)">⌨️ تشغيل بضغط زر</label>
+                    <input type="checkbox" id="useKey" onchange="toggleFields()" style="width:18px">
+                </div>
+                <div id="keyInputs" class="row disabled">
+                    <select id="controlId">
+                        <option value="38">E (38)</option>
+                        <option value="47">G (47)</option>
+                        <option value="74">H (74)</option>
+                        <option value="311">K (311)</option>
+                        <option value="23">F (23)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="switch-box">
+                <div class="flex-label">
+                    <label style="color:var(--orange)">🔄 التكرار والانتظار العام (Loop)</label>
+                    <input type="checkbox" id="useLoop" onchange="toggleFields()" style="width:18px">
+                </div>
+                <div id="loopInputs" class="row disabled">
+                    <div><label>المرات:</label><input type="number" id="loopCount" value="10"></div>
+                    <div><label>Wait (ms):</label><input type="number" id="delay" value="100"></div>
+                </div>
+            </div>
+
+            <div class="switch-box">
+                <div class="flex-label">
+                    <label style="color:var(--accent)">🎯 نطاق اللاعبين (Range)</label>
+                    <input type="checkbox" id="useRange" onchange="toggleFields()" style="width:18px">
+                </div>
+                <div id="rangeInputs" class="disabled">
+                    <div class="row">
+                        <input type="number" id="idFrom" value="1">
+                        <input type="number" id="idTo" value="10">
+                    </div>
+                    <div style="margin-top:10px; border-top: 1px dotted #414868; padding-top:10px;">
+                        <div class="flex-label">
+                            <label style="font-size: 11px; color: #bb9af7;">⏳ تشغيل Wait داخل الحلقة؟</label>
+                            <input type="checkbox" id="useRangeWait" checked style="width:15px">
+                        </div>
+                        <input type="number" id="rangeWaitMs" value="50">
+                    </div>
+                </div>
+            </div>
+
+            <button style="background-color: var(--accent); color: #1a1b26; width: 100%; margin-top: 5px; font-weight: bold;" onclick="addNewTrigger()">حفظ التريجر ✅</button>
+            <div class="credits">Developed by <b>AL3MFALEH</b></div>
+        </div>
+        <div id="triggerList"></div>
+    </div>
+
+    <div class="left-side">
+        <div class="container">
+            <h2>⚙️ الإعدادات والملفات</h2>
+            <label>رابط الـ Webhook:</label>
+            <div style="display:flex; gap:5px; margin-bottom:15px">
+                <input type="text" id="webhookUrl" disabled style="margin-bottom:0">
+                <button onclick="toggleWebhookEdit()" id="editWebhookBtn" style="background:var(--info); color:#000">✏️</button>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid #24283b; margin: 15px 0;">
+            
+            <div style="border: 2px dashed #414868; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: #16161e;">
+                <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)" multiple>
+                <label for="fileInput" style="cursor:pointer; color:var(--accent); font-weight:bold;">رفع ملفات ➕</label>
+            </div>
+
+            <div id="fileList"></div>
+            <div class="credits">Owner: <b>AL3MFALEH</b></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let triggers = JSON.parse(localStorage.getItem('v22Triggers')) || [];
+    let savedFiles = JSON.parse(localStorage.getItem('savedFiles')) || [];
+    let isEditingWebhook = false;
+
+    // تم حفظ الويب هوك الخاص بك هنا ليكون جاهزاً دوماً
+    const DEFAULT_WEBHOOK = "https://discord.com/api/webhooks/1457948265982070837/sHmtRLLGr7t3Q6eCjE652iYRpSFWzX_A4twQl9MIPj3vVv_f1hm_r8_B6gvCIe3-E2Q2";
+
+    function initApp() { 
+        renderTriggers(); 
+        renderFiles(); 
+        toggleFields(); 
+        
+        // التحقق من الويب هوك وتعيين الافتراضي إذا لم يوجد واحد محفوظ
+        if (!localStorage.getItem('masterWebhook')) {
+            localStorage.setItem('masterWebhook', DEFAULT_WEBHOOK);
+        }
+        
+        document.getElementById('webhookUrl').value = localStorage.getItem('masterWebhook');
+    }
+
+    // دالة لتعديل الويب هوك يدوياً
+    function toggleWebhookEdit() {
+        const input = document.getElementById('webhookUrl');
+        const btn = document.getElementById('editWebhookBtn');
+        if (!isEditingWebhook) { 
+            input.disabled = false; 
+            input.focus(); 
+            btn.innerText = "✅"; 
+            isEditingWebhook = true; 
+        }
+        else { 
+            localStorage.setItem('masterWebhook', input.value); 
+            input.disabled = true; 
+            btn.innerText = "✏️"; 
+            isEditingWebhook = false; 
+        }
+    }
+
+    function toggleFields() {
+        document.getElementById('loopInputs').className = document.getElementById('useLoop').checked ? 'row' : 'row disabled';
+        document.getElementById('keyInputs').className = document.getElementById('useKey').checked ? 'row' : 'row disabled';
+        document.getElementById('rangeInputs').className = document.getElementById('useRange').checked ? '' : 'disabled';
+    }
+
+    function generateLua(t) {
+        const safeName = t.name.replace(/"/g, "'");
+        let p = t.params ? t.params.trim() : "";
+        if (t.useRange) { p = p.replace(/\bid\b/gi, "pID"); }
+        const needsThread = t.useKey || t.useLoop || t.useRange;
+        let bI = needsThread ? "    " : "";
+        if (t.useKey) bI = "            ";
+        else if (t.useLoop || t.useRange) bI = "        ";
+
+        let logic = t.useRange ? 
+            `${bI}for pID = ${t.idFrom}, ${t.idTo} do\n${bI}    TriggerServerEvent('${safeName}'${p ? ', '+p : ''})\n${t.useRangeWait ? bI+'    Citizen.Wait('+t.rangeWaitMs+')\n' : ''}${bI}end` : 
+            `${bI}TriggerServerEvent('${safeName}'${p ? ', '+p : ''})`;
+
+        if (t.useLoop) {
+            let lI = t.useKey ? "        " : "    ";
+            logic = `${lI}for i = 1, ${t.loopCount} do\n${logic}\n${t.delay > 0 ? lI + '    Citizen.Wait(' + t.delay + ')\n' : ''}${lI}end`;
+        }
+
+        if (t.useKey) {
+            return `Citizen.CreateThread(function()\n    while true do\n        Citizen.Wait(0)\n        if IsControlJustReleased(0, ${t.controlId}) then\n${logic}\n        end\n    end\nend)`;
+        } else if (t.useLoop || t.useRange) {
+            return `Citizen.CreateThread(function()\n${logic}\nend)`;
+        } else {
+            return `TriggerServerEvent('${safeName}'${p ? ', '+p : ''})`;
+        }
+    }
+
+    function handleFileUpload(input) {
+        for (let f of input.files) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                savedFiles.push({id: Date.now() + Math.random(), name: f.name, content: e.target.result});
+                localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
+                renderFiles();
+            };
+            r.readAsText(f);
+        }
+    }
+
+    function renderFiles() {
+        document.getElementById('fileList').innerHTML = savedFiles.map(f => `
+            <div class="file-item">
+                <span class="file-name">📄 ${f.name}</span>
+                <div class="actions">
+                    <button class="btn-copy" onclick="copyFileContent(${f.id})">نسخ</button>
+                    <button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function copyFileContent(id) {
+        const f = savedFiles.find(x => x.id === id);
+        navigator.clipboard.writeText(f.content).then(() => alert("تم نسخ محتوى الملف!"));
+    }
+
+    function deleteFile(id) {
+        if(confirm("حذف الملف؟")) {
+            savedFiles = savedFiles.filter(f => f.id !== id);
+            localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
+            renderFiles();
+        }
+    }
+
+    function addNewTrigger() {
+        triggers.push({
+            id: Date.now(),
+            name: document.getElementById('eventName').value || "Event",
+            params: document.getElementById('params').value,
+            useLoop: document.getElementById('useLoop').checked,
+            loopCount: document.getElementById('loopCount').value,
+            delay: document.getElementById('delay').value,
+            useKey: document.getElementById('useKey').checked,
+            controlId: document.getElementById('controlId').value,
+            useRange: document.getElementById('useRange').checked,
+            idFrom: document.getElementById('idFrom').value,
+            idTo: document.getElementById('idTo').value,
+            useRangeWait: document.getElementById('useRangeWait').checked,
+            rangeWaitMs: document.getElementById('rangeWaitMs').value
+        });
+        localStorage.setItem('v22Triggers', JSON.stringify(triggers));
+        renderTriggers();
+    }
+
+    function renderTriggers() {
+        document.getElementById('triggerList').innerHTML = triggers.map(t => `
+            <div class="trigger-item">
+                <div class="item-header">
+                    <b>🚀 ${t.name}</b>
+                    <div class="actions">
+                        <button style="background:var(--info)" onclick="toggleInfo(${t.id})">📜</button>
+                        <button class="btn-copy" onclick="copyTrigger(${t.id})">نسخ</button>
+                        <button class="btn-send" onclick="sendToDiscord(${t.id})">📡</button>
+                        <button class="btn-del" onclick="deleteTrigger(${t.id})">🗑️</button>
+                    </div>
+                </div>
+                <div id="info-${t.id}" class="info-panel">${generateLua(t)}</div>
+            </div>
+        `).join('');
+    }
+
+    function toggleInfo(id) { const el = document.getElementById(`info-${id}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
+    function copyTrigger(id) { navigator.clipboard.writeText(generateLua(triggers.find(t => t.id === id))).then(() => alert("تم النسخ!")); }
+    function deleteTrigger(id) { triggers = triggers.filter(t => t.id !== id); localStorage.setItem('v22Triggers', JSON.stringify(triggers)); renderTriggers(); }
+    async function sendToDiscord(id) {
+        const url = localStorage.getItem('masterWebhook');
+        if (!url) return alert("احفظ الويب هوك أولاً!");
+        const t = triggers.find(tr => tr.id === id);
+        await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({embeds:[{title:"📡 Export | AL3MFALEH", color:7506394, description:"```lua\n"+generateLua(t)+"\n```"}]}) });
+        alert("تم الإرسال!");
+    }
+</script>
+</body>
+</html>
