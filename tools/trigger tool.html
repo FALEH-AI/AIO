@@ -19,10 +19,8 @@
         .switch-box { background: #16161e; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #24283b; }
         .flex-label { display: flex; justify-content: space-between; align-items: center; }
         button { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
-        
         .file-item { display: flex; justify-content: space-between; align-items: center; background: #24283b; padding: 10px; margin-bottom: 8px; border-radius: 6px; border-right: 3px solid var(--orange); }
         .file-name { font-size: 0.8rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
-        
         .trigger-item { background-color: #24283b; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
         .info-panel { background: #16161e; padding: 10px; border-radius: 6px; display: none; margin-top: 10px; font-size: 0.75rem; border: 1px solid #414868; color: #9ece6a; white-space: pre-wrap; font-family: monospace; }
         .actions { display: flex; gap: 5px; }
@@ -41,40 +39,18 @@
         <div class="container">
             <h2>🛠️ مولد التريجرات الاحترافي | AL3MFALEH</h2>
             <div class="row">
-                <div style="flex:2">
-                    <label>اسم التريجر:</label>
-                    <input type="text" id="eventName" placeholder="esx:giveInventoryItem">
-                </div>
-                <div>
-                    <label>المعطيات (Params):</label>
-                    <input type="text" id="params" placeholder="pID, 'item', vID">
-                </div>
+                <div style="flex:2"><label>اسم التريجر:</label><input type="text" id="eventName" placeholder="esx:giveInventoryItem"></div>
+                <div><label>المعطيات (Params):</label><input type="text" id="params" placeholder="pID, 'item', vID"></div>
             </div>
+            <div><label>شرح التريجر (يظهر في الديسكورد):</label><textarea id="eventDesc" placeholder="اكتب هنا وظيفة التريجر..."></textarea></div>
 
-            <div>
-                <label>شرح التريجر (يظهر في الديسكورد):</label>
-                <textarea id="eventDesc" placeholder="اكتب هنا وظيفة التريجر أو ملاحظاتك..."></textarea>
+            <div class="switch-box">
+                <div class="flex-label"><label style="color:var(--green)">⌨️ تشغيل بضغط زر</label><input type="checkbox" id="useKey" onchange="toggleFields()"></div>
+                <div id="keyInputs" class="row disabled"><select id="controlId"><option value="38">E (38)</option><option value="47">G (47)</option><option value="74">H (74)</option></select></div>
             </div>
 
             <div class="switch-box">
-                <div class="flex-label">
-                    <label style="color:var(--green)">⌨️ تشغيل بضغط زر</label>
-                    <input type="checkbox" id="useKey" onchange="toggleFields()">
-                </div>
-                <div id="keyInputs" class="row disabled">
-                    <select id="controlId">
-                        <option value="38">E (38)</option>
-                        <option value="47">G (47)</option>
-                        <option value="74">H (74)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="switch-box">
-                <div class="flex-label">
-                    <label style="color:var(--orange)">🔄 تكرار عام (Global Loop)</label>
-                    <input type="checkbox" id="useLoop" onchange="toggleFields()">
-                </div>
+                <div class="flex-label"><label style="color:var(--orange)">🔄 تكرار عام (Global Loop)</label><input type="checkbox" id="useLoop" onchange="toggleFields()"></div>
                 <div id="loopInputs" class="row disabled">
                     <div><label>المرات:</label><input type="number" id="loopCount" value="10"></div>
                     <div><label>الانتظار (ms):</label><input type="number" id="delay" value="100"></div>
@@ -82,30 +58,15 @@
             </div>
 
             <div class="switch-box">
-                <div class="flex-label">
-                    <label style="color:var(--accent)">🎯 نطاق اللاعبين (Range pID)</label>
-                    <input type="checkbox" id="useRange" onchange="toggleFields()">
-                </div>
+                <div class="flex-label"><label style="color:var(--accent)">🎯 نطاق اللاعبين (Range pID)</label><input type="checkbox" id="useRange" onchange="toggleFields()"></div>
                 <div id="rangeInputs" class="disabled">
-                    <div class="row">
-                        <input type="number" id="idFrom" value="1" placeholder="ID من">
-                        <input type="number" id="idTo" value="10" placeholder="ID إلى">
-                    </div>
-                    <div class="flex-label" style="margin-top:10px">
-                        <label style="color: #bb9af7;">⛓️ عدّاد متسلسل (vID) لكل لاعب؟</label>
-                        <input type="checkbox" id="useSequential" onchange="toggleFields()">
-                    </div>
+                    <div class="row"><input type="number" id="idFrom" value="1" placeholder="ID من"><input type="number" id="idTo" value="10" placeholder="ID إلى"></div>
+                    <div class="flex-label" style="margin-top:10px"><label style="color: #bb9af7;">⛓️ عدّاد متسلسل (vID) لكل لاعب؟</label><input type="checkbox" id="useSequential" onchange="toggleFields()"></div>
                     <div id="sequentialSettings" class="disabled">
                         <label style="font-size: 11px;">نطاق vID (من - إلى):</label>
-                        <div class="row">
-                            <input type="number" id="seqFrom" value="1">
-                            <input type="number" id="seqTo" value="50">
-                        </div>
+                        <div class="row"><input type="number" id="seqFrom" value="1"><input type="number" id="seqTo" value="50"></div>
                     </div>
-                    <div class="flex-label" style="margin-top:10px">
-                        <label style="font-size: 11px; color: #9ece6a;">⏳ انتظار (Wait) داخل النطاق:</label>
-                        <input type="checkbox" id="useRangeWait" checked>
-                    </div>
+                    <div class="flex-label" style="margin-top:10px"><label style="font-size: 11px; color: #9ece6a;">⏳ انتظار (Wait) داخل النطاق:</label><input type="checkbox" id="useRangeWait" checked></div>
                     <input type="number" id="rangeWaitMs" value="50">
                 </div>
             </div>
@@ -119,13 +80,7 @@
         <div class="container">
             <h2>⚙️ الإعدادات والملفات</h2>
             <label>رابط الـ Webhook:</label>
-            <div style="display:flex; gap:5px; margin-bottom:15px">
-                <input type="text" id="webhookUrl" disabled>
-                <button onclick="toggleWebhookEdit()" id="editWebhookBtn" style="background:var(--info)">✏️</button>
-            </div>
-            
-            <hr style="border:0; border-top:1px solid #24283b; margin:15px 0;">
-            
+            <div style="display:flex; gap:5px; margin-bottom:15px"><input type="text" id="webhookUrl" disabled><button onclick="toggleWebhookEdit()" id="editWebhookBtn" style="background:var(--info)">✏️</button></div>
             <div style="border: 2px dashed #414868; padding: 15px; text-align: center; border-radius: 8px; background: #16161e;">
                 <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)" multiple>
                 <label for="fileInput" style="cursor:pointer; color:var(--accent); font-weight:bold;">رفع ملفات ➕</label>
@@ -161,10 +116,14 @@
         const safeName = t.name.replace(/"/g, "'");
         let p = t.params ? t.params.trim() : "";
         p = p.replace(/\bpID\b/gi, "pID").replace(/\bvID\b/gi, "vID");
-        let indent = t.useKey ? "            " : "        ";
+        
+        // التحقق مما إذا كان الكود يحتاج لـ Thread
+        const needsThread = t.useKey || t.useLoop || t.useRange;
+        let indent = "";
+        if (needsThread) indent = t.useKey ? "            " : "        ";
         
         let coreLogic = `TriggerServerEvent('${safeName}'${p ? ', '+p : ''})`;
-        if (t.useRangeWait) coreLogic += `\n${indent}        Citizen.Wait(${t.rangeWaitMs})`;
+        if (t.useRangeWait && t.useRange) coreLogic += `\n${indent}        Citizen.Wait(${t.rangeWaitMs})`;
 
         let logic = "";
         if (t.useRange) {
@@ -174,7 +133,7 @@
                 logic = `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    ${coreLogic}\n${indent}end`;
             }
         } else {
-            logic = `${indent}${coreLogic}`;
+            logic = (needsThread ? indent : "") + coreLogic;
         }
 
         if (t.useLoop) {
@@ -182,8 +141,14 @@
             logic = `${loopIndent}for i = 1, ${t.loopCount} do\n${logic}\n${t.delay > 0 ? loopIndent + '    Citizen.Wait(' + t.delay + ')\n' : ''}${loopIndent}end`;
         }
 
-        if (t.useKey) return `Citizen.CreateThread(function()\n    while true do\n        Citizen.Wait(0)\n        if IsControlJustReleased(0, ${t.controlId}) then\n${logic}\n        end\n    end\nend)`;
-        return `Citizen.CreateThread(function()\n${logic}\nend)`;
+        if (t.useKey) {
+            return `Citizen.CreateThread(function()\n    while true do\n        Citizen.Wait(0)\n        if IsControlJustReleased(0, ${t.controlId}) then\n${logic}\n        end\n    end\nend)`;
+        } else if (t.useLoop || t.useRange) {
+            return `Citizen.CreateThread(function()\n${logic}\nend)`;
+        } else {
+            // كود سادة بدون Thread
+            return coreLogic;
+        }
     }
 
     function handleFileUpload(input) {
@@ -202,10 +167,7 @@
         document.getElementById('fileList').innerHTML = savedFiles.map(f => `
             <div class="file-item">
                 <span class="file-name">📄 ${f.name}</span>
-                <div class="actions">
-                    <button class="btn-copy" onclick="copyFileContent(${f.id})">نسخ</button>
-                    <button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button>
-                </div>
+                <div class="actions"><button class="btn-copy" onclick="copyFileContent(${f.id})">نسخ</button><button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button></div>
             </div>
         `).join('');
     }
@@ -254,7 +216,6 @@
         }
         localStorage.setItem('v22Triggers', JSON.stringify(triggers));
         renderTriggers();
-        // مسح الحقول بعد الحفظ
         document.getElementById('eventName').value = "";
         document.getElementById('params').value = "";
         document.getElementById('eventDesc').value = "";
@@ -314,25 +275,16 @@
     async function sendToDiscord(id) {
         const url = localStorage.getItem('masterWebhook');
         const t = triggers.find(tr => tr.id === id);
-        
         const embed = {
             title: "📡 Export Trigger | AL3MFALEH",
             color: 7506394,
-            fields: [
-                { name: "Event Name", value: `\`${t.name}\``, inline: true },
-                { name: "Description", value: t.desc || "No description provided." }
-            ],
+            fields: [{ name: "Event", value: `\`${t.name}\``, inline: true }, { name: "Description", value: t.desc || "---" }],
             description: "```lua\n" + generateLua(t) + "\n```",
             footer: { text: "Dev Tool by AL3MFALEH" },
             timestamp: new Date()
         };
-
-        await fetch(url, { 
-            method: 'POST', 
-            headers: {'Content-Type': 'application/json'}, 
-            body: JSON.stringify({ embeds: [embed] }) 
-        });
-        alert("تم إرسال التريجر مع الوصف بنجاح!");
+        await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [embed] }) });
+        alert("تم الإرسال!");
     }
 </script>
 </body>
