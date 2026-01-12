@@ -10,10 +10,11 @@
     label { display: block; margin-top: 15px; font-size: 14px; color: #a9b1d6; }
     input, select, button, textarea { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #24283b; box-sizing: border-box; }
     input, select, textarea { background-color: #1a1b26; color: white; font-family: 'Consolas', monospace; }
-    .btn-send { background-color: #7aa2f7; color: #0a0a0b; margin-top: 20px; font-size: 16px; font-weight: bold; }
+    .btn-send { background-color: #7aa2f7; color: #0a0a0b; margin-top: 20px; font-size: 16px; font-weight: bold; cursor: pointer; }
     .btn-send:hover { background-color: #89ddff; }
-    .btn-settings { background-color: #24283b; color: #7aa2f7; font-size: 11px; padding: 6px 12px; border: 1px solid #7aa2f7; }
-    .footer-rights { border-top: 1px solid #24283b; color: #7aa2f7; }
+    .btn-settings { background-color: #24283b; color: #7aa2f7; font-size: 11px; padding: 6px 12px; border: 1px solid #7aa2f7; cursor: pointer; }
+    .footer-rights { border-top: 1px solid #24283b; color: #7aa2f7; margin-top: 20px; padding-top: 10px; text-align: center; font-size: 12px; }
+    #responseMsg { text-align: center; margin-top: 10px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -24,6 +25,9 @@
     </div>
     <h2>🚀 Trigger 𝖲tatus</h2>
     
+    <label>وصف التريجر:</label>
+    <input type="text" id="triggerDesc" placeholder="مثال: تريجر توزيع الفلوس أو غسيل الأموال...">
+
     <label>كود التريجر:</label>
     <textarea id="triggerCode" rows="5" placeholder="ألصق كود FiveM هنا..."></textarea>
 
@@ -43,11 +47,10 @@
 </div>
 
 <script>
-    // الروابط الافتراضية التي زودتني بها
+    // الروابط الافتراضية
     const defaultMain = "https://discord.com/api/webhooks/1457963238472814637/L5310W7JVYdSFjvnSAUAQt7tyAmcGmPBkv3v50BSI3OZ4-cM-tXqzBiBdcUhReTC37Hc";
     const defaultEmergency = "https://discord.com/api/webhooks/1457965562947829865/Raj3glMZUKFCjWH-dIEH6iSP4tUpRh-tjvrRa4ohwJ20cNOIkylvtwRHLExEjjBs1zYR";
 
-    // تفعيل الروابط عند أول تشغيل للمتصفح
     window.onload = function() {
         if (!localStorage.getItem('webhook_main')) {
             localStorage.setItem('webhook_main', defaultMain);
@@ -73,6 +76,7 @@
     }
 
     function sendToDiscord() {
+        const description = document.getElementById('triggerDesc').value;
         const code = document.getElementById('triggerCode').value;
         const statusValue = document.getElementById('triggerStatus').value;
         const statusText = document.getElementById('triggerStatus').options[document.getElementById('triggerStatus').selectedIndex].text;
@@ -87,7 +91,8 @@
                 title: statusValue === "working" ? "✅ Trigger Status: Working" : "⚠️ Trigger Status: Broken",
                 color: statusValue === "working" ? 3066993 : 15158332,
                 fields: [
-                    { name: "الحالة المختارة", value: `**${statusText}**`, inline: false },
+                    { name: "وصف التريجر", value: description || "لا يوجد وصف", inline: false },
+                    { name: "الحالة", value: `**${statusText}**`, inline: true },
                     { name: "كود النسخ:", value: "```lua\n" + code + "\n```", inline: false }
                 ],
                 footer: { text: "System Developed by AL3MFALEH | Trigger Status" },
