@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>AL3MFALEH | Standard Template Generator</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --sidebar-color: #141621;
+            --text-primary: #7d5fff;
+            --text-secondary: #c5c6c7;
+            --accent: #7d5fff;
+            --danger: #ff4c4c;
+            --success: #2ecc71;
+            --blue: #3498db;
+            --purple: #7d5fff;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-secondary); margin: 0; display: flex; height: 100vh; overflow: hidden; direction: ltr; }
+
+        /* Sidebar Styling */
+        .sidebar { width: 380px; background-color: var(--sidebar-color); border-right: 1px solid #2d2f3f; display: flex; flex-direction: column; padding: 20px; }
+        .cat-box { background: #1a1a1a; border-radius: 8px; padding: 12px; margin-bottom: 15px; border: 1px solid #2d2f3f; }
+        
+        .item-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #252525; padding: 8px 10px; margin: 5px 0; border-radius: 6px; 
+            cursor: pointer; font-size: 13px; transition: 0.2s;
+        }
+        .item-row:hover { background: #303030; border-color: var(--accent); }
+        .del-btn { color: var(--danger); font-weight: bold; margin-left: 10px; cursor: pointer; }
+
+        /* Main Content Styling */
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; position: relative; }
+        .card { background: #1a1d29; padding: 25px; border-radius: 12px; border: 1px solid #2d2f3f; position: relative; }
+        
+        /* Watermark Copyright */
+        .watermark { position: absolute; top: 15px; right: 25px; font-size: 14px; color: var(--accent); font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+        .footer-credits { text-align: center; padding: 10px; color: var(--text-primary); font-size: 12px; font-weight: bold; opacity: 0.8; }
+
+        input, textarea { width: 100%; background: #0b0c10; border: 1px solid #2d2f3f; color: white; padding: 10px; border-radius: 8px; outline: none; box-sizing: border-box; }
+        
+        .mods-container { display: flex; gap: 15px; padding: 12px; background: #0b0c10; border-radius: 8px; border: 1px dashed var(--accent); margin-top: 15px; align-items: center; flex-wrap: wrap; }
+
+        .btn-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .btn-gen { background-color: var(--success); color: #000; }
+        .btn-copy { background-color: var(--blue); }
+        .btn-save { background-color: var(--purple); }
+        .btn-discord { background-color: #5865F2; }
+
+        pre { background: #000; padding: 15px; border-radius: 8px; color: #00ff41; font-family: 'Consolas', monospace; font-size: 12px; border: 1px solid #2d2f3f; white-space: pre-wrap; margin-top: 10px; position: relative; }
+        
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 15px; }
+        .hist-card { background: #1a1a1a; padding: 12px; border-radius: 8px; border-left: 4px solid var(--purple); display: flex; justify-content: space-between; align-items: center; }
+        .mini-btn { border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; color: white; margin-left: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="color:var(--text-primary); margin-top:0;">📂 Categories Manager</h2>
+        <div id="catContainer" style="flex: 1; overflow-y: auto; padding-right: 5px;"></div>
+        
+        <div style="padding-top: 15px; border-top: 1px solid #2d2f3f;">
+            <input type="text" id="newCatInput" placeholder="New category name..." style="font-size: 12px;">
+            <button onclick="addCategory()" class="btn" style="width:100%; padding: 8px; margin-top: 5px; background: var(--accent);">+ Create Category</button>
+        </div>
+        <div class="footer-credits">CREATED BY AL3MFALEH</div>
+    </div>
+
+    <div class="main-content">
+        <div class="card">
+            <div class="watermark">© AL3MFALEH</div>
+            <h1 style="margin-top:0; color:var(--text-primary);">🛠 AL3MFALEH | Shops Maker</h1>
+            
+            <label>Discord Webhook</label>
+            <input type="text" id="webhookURL" placeholder="Webhook URL..." onchange="localStorage.setItem('al3_wh', this.value)">
+
+            <label style="margin-top: 10px; display: block;">Items List</label>
+            <textarea id="itemsArea" rows="2" placeholder="item1, item2..." oninput="generate()"></textarea>
+
+            <div style="display:flex; gap:12px; margin-top:15px;">
+                <div style="flex:1"><label>Price</label><input type="number" id="price" value="0" oninput="generate()"></div>
+                <div style="flex:1"><label>Amount</label><input type="number" id="amount" value="100000" oninput="generate()"></div>
+                <div style="flex:2"><label style="color:var(--blue)">Save Name</label><input type="text" id="marketSaveName" value="vending_drink_config"></div>
+            </div>
+
+            <div class="mods-container">
+                <span style="color:var(--text-primary); font-weight:bold; font-size: 12px;">WEAPON MODS:</span>
+                <label style="font-size: 12px;"><input type="checkbox" id="supp" onchange="generate()"> Suppressor</label>
+                <label style="font-size: 12px;"><input type="checkbox" id="ext" onchange="generate()"> Ext Mag</label>
+                <label style="font-size: 12px;"><input type="checkbox" id="flash" onchange="generate()"> Flashlight</label>
+                <div style="margin-left: 10px; border-left: 1px solid #333; padding-left: 10px;">
+                    <span style="font-size: 12px;">Ammo:</span> <input type="number" id="ammoAmt" style="width:70px; padding:4px" value="250" oninput="generate()">
+                </div>
+            </div>
+
+            <div class="btn-grid">
+                <button class="btn btn-gen" onclick="generate()">Generate ✨</button>
+                <button class="btn btn-copy" onclick="copyCode()">Copy 📋</button>
+                <button class="btn btn-save" onclick="saveMarket()">Save 💾</button>
+                <button class="btn btn-discord" onclick="sendToDiscord()">Discord 🚀</button>
+            </div>
+        </div>
+
+        <pre id="output">-- Code will appear here...</pre>
+
+        <h3 style="color:var(--purple); border-bottom: 1px solid #333; margin-bottom: 10px;">💾 SAVED CONFIGURATIONS</h3>
+        <div id="historyGrid" class="history-grid"></div>
+    </div>
+
+<script>
+    // الأيتمات والحقوق البرمجية
+    const initialItems = {
+        "Weapons (الأسلحة)": ["weapon_heavypistol", "weapon_pistol_mk2", "weapon_pistol50", "weapon_digiscanner", "Armor", "pistol_ammo", "rifle_ammo", "ziptie"],
+        "Robbery (السرقة)": ["robbery_thermite", "robbery_red_laptop", "robbery_red_pen", "robbery_boltcutter", "robbery_green_keycard", "lockpick", "advancedlockpick", "electronickit", "gatecrack", "thermite", "angle_grinder", "plasma_cutter", "hack_usb", "explosives", "bomb_c4", "atmtowingrope", "atmobj", "weldingcutter"],
+        "Loot (المسروقات)": ["painting", "purple_keycard", "rare_coins", "classified_docs", "diamond_necklace", "luxurious_watch", "moneyroll", "pink_diamond", "rare_tequila"],
+        "Foods & Drinks (أطعمة)": ["sandwich", "water_bottle", "double_cheese_burger", "cheese_burger", "pizza_pepperoni", "pizza_mushroom", "mojito", "juice", "sunday", "sprite", "burger-bleeder", "burger-moneyshot", "burger-torpedo", "burger-heartstopper", "burger-meatfree", "burger-fries", "burger-softdrink", "burger-mshake"],
+        "Raw Materials (موارد)": ["plastic", "metalscrap", "copper", "aluminum", "aluminumoxide", "iron", "ironoxide", "steel", "rubber", "recyclablematerial", "refined_aluminium", "refined_copper", "refined_glass", "refined_plastic", "refined_rubber", "refined_scrap", "refined_steel", "stone", "uncut_emerald", "uncut_ruby", "uncut_diamond", "uncut_sapphire"],
+        "Drugs (مخدرات)": ["joint", "cokebaggy", "crack_baggy", "xtcbaggy", "oxy", "meth", "rolling_paper", "meth_bag", "coke_brick", "weed_brick", "bong"]
+    };
+
+    let store = JSON.parse(localStorage.getItem('al3_store_v7')) || initialItems;
+
+    function renderUI() {
+        const container = document.getElementById('catContainer');
+        container.innerHTML = '';
+        for (let cat in store) {
+            container.innerHTML += `
+                <div class="cat-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="color:var(--accent); font-size: 14px;">${cat}</strong>
+                        <span onclick="deleteCat('${cat}')" style="color:var(--danger); cursor:pointer;">&times;</span>
+                    </div>
+                    <div id="items-${cat}" style="max-height: 150px; overflow-y: auto;">
+                        ${store[cat].map(item => `
+                            <div class="item-row" onclick="addItemToArea('${item}')">
+                                <span>${item}</span>
+                                <span class="del-btn" onclick="event.stopPropagation(); deleteItem('${cat}', '${item}')">&times;</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display:flex; gap:5px; margin-top:10px;">
+                        <input type="text" id="input-${cat}" placeholder="Add..." style="padding:5px; font-size:11px; flex:1;">
+                        <button onclick="addItemToStore('${cat}')" style="background:var(--success); border:none; padding:0 8px; border-radius:4px; cursor:pointer;">+</button>
+                    </div>
+                </div>`;
+        }
+        localStorage.setItem('al3_store_v7', JSON.stringify(store));
+        renderHistory();
+    }
+
+    function addItemToStore(cat) {
+        const input = document.getElementById(`input-${cat}`);
+        if(input.value) { store[cat].push(input.value.trim()); input.value = ''; renderUI(); }
+    }
+    function deleteItem(cat, item) { store[cat] = store[cat].filter(i => i !== item); renderUI(); }
+    function addCategory() { 
+        const val = document.getElementById('newCatInput').value.trim();
+        if(val) { store[val] = []; document.getElementById('newCatInput').value = ''; renderUI(); } 
+    }
+    function deleteCat(cat) { if(confirm('حذف الفئة بالكامل؟')) { delete store[cat]; renderUI(); } }
+    
+    function addItemToArea(name) {
+        const area = document.getElementById('itemsArea');
+        const items = area.value.split(',').map(i => i.trim()).filter(i => i !== "");
+        if (!items.includes(name)) {
+            area.value = area.value ? area.value + ", " + name : name;
+            generate();
+        }
+    }
+
+    function generate(silent = false) {
+        const items = document.getElementById('itemsArea').value.split(',').map(s => s.trim()).filter(s => s !== "");
+        const amt = document.getElementById('amount').value;
+        const prc = document.getElementById('price').value;
+        const ammo = document.getElementById('ammoAmt').value;
+
+        let att = [];
+        if(document.getElementById('supp').checked) att.push('"suppressor"');
+        if(document.getElementById('ext').checked) att.push('"extended_clip"');
+        if(document.getElementById('flash').checked) att.push('"flashlight"');
+        let attStr = att.length > 0 ? `attachments = { ${att.join(', ')} }, ` : "";
+
+        let productsRows = "";
+        items.forEach((item, i) => {
+            let isWep = item.startsWith("weapon_") || item.includes("Armor");
+            let info = isWep ? `{ ${attStr}ammo = ${ammo} }` : `{}`;
+            productsRows += `        [${i+1}] = { name = "${item}", price = ${prc}, amount = ${amt}, info = ${info}, type = "item", slot = ${i+1} },\n`;
+        });
+
+        // تم إضافة الحقوق داخل الكود المولد هنا
+        const code = `-- Generated by AL3MFALEH 
+local Config = {}
+
+Config.Products = {
+    ["arcadebar"] = {
+${productsRows}    }
+}
+
+Config.Locations = {
+    ["arcadebar"] = {
+        ["blip"] = "arcadebar_shop_blip",
+        ["label"] = "arcadebar_shop",
+        ["type"] = "arcadebar",
+        ["coords"] = {[1] = vector3(339.17, -909.97, 29.25)},
+        ["products"] = Config.Products["arcadebar"],
+    },
+}
+
+local ShopItems = {}
+ShopItems.label = Config.Locations["arcadebar"]["label"]
+ShopItems.items = Config.Locations["arcadebar"]["products"]
+ShopItems.slots = 1 
+
+-- Trigger for AL3MFALEH Shops
+TriggerServerEvent("inventory:server:OpenInventory", "shop", "vending_drink", ShopItems)`;
+        
+        if (!silent) document.getElementById('output').innerText = code;
+        return code;
+    }
+
+    function saveMarket() {
+        const label = document.getElementById('marketSaveName').value || "Unnamed";
+        const data = { 
+            items: document.getElementById('itemsArea').value, 
+            prc: document.getElementById('price').value, 
+            amt: document.getElementById('amount').value,
+            ammo: document.getElementById('ammoAmt').value,
+            saveLabel: label
+        };
+        localStorage.setItem('AL3_V7_SAVE_' + label, JSON.stringify(data));
+        renderHistory();
+        alert("Saved! © AL3MFALEH 💾");
+    }
+
+    function renderHistory() {
+        const grid = document.getElementById('historyGrid');
+        grid.innerHTML = '';
+        for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            if(key.startsWith('AL3_V7_SAVE_')) {
+                let name = key.replace('AL3_V7_SAVE_', '');
+                grid.innerHTML += `
+                    <div class="hist-card">
+                        <strong>${name}</strong>
+                        <div>
+                            <button class="mini-btn" style="background:var(--accent)" onclick="loadSaved('${key}')">Edit</button>
+                            <button class="mini-btn" style="background:var(--blue)" onclick="copySaved('${key}')">Copy</button>
+                            <button class="mini-btn" style="background:var(--danger)" onclick="deleteHist('${key}')">×</button>
+                        </div>
+                    </div>`;
+            }
+        }
+    }
+
+    function loadSaved(key) {
+        const data = JSON.parse(localStorage.getItem(key));
+        document.getElementById('itemsArea').value = data.items;
+        document.getElementById('price').value = data.prc;
+        document.getElementById('amount').value = data.amt;
+        document.getElementById('ammoAmt').value = data.ammo;
+        document.getElementById('marketSaveName').value = data.saveLabel;
+        generate();
+    }
+
+    function copySaved(key) { loadSaved(key); copyCode(); }
+    function deleteHist(key) { if(confirm('حذف هذا الحفظ؟')) { localStorage.removeItem(key); renderHistory(); } }
+    function copyCode() { navigator.clipboard.writeText(generate()); alert("تم النسخ! © AL3MFALEH 📋"); }
+
+    async function sendToDiscord() {
+        const url = document.getElementById('webhookURL').value;
+        if(!url) return alert("أدخل رابط الويب هوك!");
+        const code = generate(true);
+        const name = document.getElementById('marketSaveName').value;
+        const blob = new Blob([code], { type: 'text/plain' });
+        const formData = new FormData();
+        formData.append('file', blob, "config.lua");
+        formData.append('payload_json', JSON.stringify({ 
+            content: `✅ **تجهيز كود جديد**\n**الاسم:** ${name}\n**المطور:** AL3MFALEH`, 
+            username: "AL3MFALEH SYSTEM" 
+        }));
+        await fetch(url, { method: 'POST', body: formData });
+        alert("Sent to Discord! 🚀");
+    }
+
+    window.onload = () => {
+        renderUI();
+        document.getElementById('webhookURL').value = localStorage.getItem('al3_wh') || "";
+        generate();
+    };
+</script>
+</body>
+</html>
