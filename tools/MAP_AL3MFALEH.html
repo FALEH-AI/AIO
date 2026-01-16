@@ -20,12 +20,11 @@
         
         input, select { 
             padding: 10px; background: #111; border: 1px solid #333; 
-            color: #ffffff; /* تم تغيير اللون للأبيض هنا */
+            color: #ffffff; 
             text-align: center; font-family: monospace; border-radius: 5px; font-size: 14px;
             direction: ltr; unicode-bidi: plaintext;
         }
 
-        /* جعل حقل الاسم يكتب من اليمين للأبيض أيضاً */
         #name_input { direction: rtl; color: #ffffff; }
 
         button { padding: 12px; cursor: pointer; border: none; font-weight: bold; border-radius: 6px; transition: 0.2s; margin-top: 5px; }
@@ -40,7 +39,7 @@
         }
         .saved-item:hover { border-color: #ffffff; background: #2a2a2a; }
         .saved-info { display: flex; flex-direction: column; font-size: 12px; text-align: right; pointer-events: none; }
-        .saved-name { color: #ffffff; font-weight: bold; margin-bottom: 2px; } /* اسم الموقع المحفوظ أبيض */
+        .saved-name { color: #ffffff; font-weight: bold; margin-bottom: 2px; }
         .btn-delete { color: #ff4444; background: none; border: none; padding: 5px; cursor: pointer; font-size: 16px; }
 
         .leaflet-control-attribution { background: rgba(0, 0, 0, 0.8) !important; color: #ffffff !important; }
@@ -102,12 +101,11 @@
         var selected = document.getElementById('mapSelector').value;
         var ext = (selected === 'styleGrid') ? 'png' : 'jpg';
         if (tileLayer) map.removeLayer(tileLayer);
+        
+        // تعديل: السحب من الملفات المحلية فقط
         tileLayer = L.tileLayer('./' + selected + '/{z}/{x}/{y}.' + ext, {
             minZoom: 0, maxZoom: 5, noWrap: true, attribution: 'AL3MFALEH'
         }).addTo(map);
-        tileLayer.on('tileerror', function() {
-            this.setUrl('https://gtamap.xyz/mapStyles/' + selected + '/{z}/{x}/{y}.' + ext);
-        });
     }
 
     changeMap();
