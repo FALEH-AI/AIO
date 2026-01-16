@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Map location GTA AL3MFALEH</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body { margin: 0; background: #000; color: white; font-family: sans-serif; overflow: hidden; }
+        #map { height: 100vh; width: 100vw; background: #000; position: absolute; }
+        
+        .side-panel {
+            position: absolute; top: 20px; right: 20px; width: 240px;
+            background: rgba(0, 0, 0, 0.9); padding: 15px; border-radius: 12px;
+            border: 1px solid #444; z-index: 1000; display: flex; flex-direction: column; gap: 10px;
+            box-shadow: 0 0 15px rgba(0,255,0,0.2); max-height: 90vh; overflow-y: auto;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        label { font-size: 11px; color: #888; font-weight: bold; }
+        
+        input, select { 
+            padding: 10px; background: #111; border: 1px solid #333; 
+            color: #ffffff; /* تم تغيير اللون للأبيض هنا */
+            text-align: center; font-family: monospace; border-radius: 5px; font-size: 14px;
+            direction: ltr; unicode-bidi: plaintext;
+        }
+
+        /* جعل حقل الاسم يكتب من اليمين للأبيض أيضاً */
+        #name_input { direction: rtl; color: #ffffff; }
+
+        button { padding: 12px; cursor: pointer; border: none; font-weight: bold; border-radius: 6px; transition: 0.2s; margin-top: 5px; }
+        .btn-go { background: #28a745; color: white; }
+        .btn-save { background: #007bff; color: white; }
+        
+        .saved-list { margin-top: 15px; border-top: 1px solid #333; padding-top: 10px; }
+        .saved-item {
+            background: #222; padding: 10px; border-radius: 5px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .saved-item:hover { border-color: #ffffff; background: #2a2a2a; }
+        .saved-info { display: flex; flex-direction: column; font-size: 12px; text-align: right; pointer-events: none; }
+        .saved-name { color: #ffffff; font-weight: bold; margin-bottom: 2px; } /* اسم الموقع المحفوظ أبيض */
+        .btn-delete { color: #ff4444; background: none; border: none; padding: 5px; cursor: pointer; font-size: 16px; }
+
+        .leaflet-control-attribution { background: rgba(0, 0, 0, 0.8) !important; color: #ffffff !important; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="side-panel">
+    <div class="input-group">
+        <label>نوع الخريطة</label>
+        <select id="mapSelector" onchange="changeMap()">
+            <option value="styleAtlas" selected>Atlas</option>
+            <option value="styleSatelite">Satellite</option>
+            <option value="styleGrid">Grid</option>
+        </select>
+    </div>
+
+    <hr style="border: 0.5px solid #333; margin: 5px 0;">
+
+    <div class="input-group">
+        <label>اسم الموقع</label>
+        <input type="text" id="name_input" placeholder="مثلاً: مقر العصابة">
+    </div>
+    <div class="input-group">
+        <label>إحداثيات X</label>
+        <input type="text" id="x_input" placeholder="0.00">
+    </div>
+    <div class="input-group">
+        <label>إحداثيات Y</label>
+        <input type="text" id="y_input" placeholder="0.00">
+    </div>
+
+    <button class="btn-go" onclick="goToCoords()">📍 توجه للموقع</button>
+    <button class="btn-save" onclick="saveLocation()">💾 حفظ الإحداثيات</button>
+
+    <div class="saved-list" id="savedList">
+        <label style="color: #ffffff;">المواقع المحفوظة:</label>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    const center_x = 117.3, center_y = 172.8, scale_x = 0.02072, scale_y = 0.0205;
+
+    L.CRS.GTAMap = L.extend({}, L.CRS.Simple, {
+        projection: L.Projection.LonLat,
+        transformation: new L.Transformation(scale_x, center_x, -scale_y, center_y),
+        scale: function(zoom) { return Math.pow(2, zoom); },
+        zoom: function(scale) { return Math.log(scale) / 0.6931471805599453; },
+        infinite: true
+    });
+
+    var map = L.map('map', { crs: L.CRS.GTAMap, minZoom: 1, maxZoom: 5, zoomControl: false });
+    var tileLayer, marker;
+
+    function changeMap() {
+        var selected = document.getElementById('mapSelector').value;
+        var ext = (selected === 'styleGrid') ? 'png' : 'jpg';
+        if (tileLayer) map.removeLayer(tileLayer);
+        tileLayer = L.tileLayer('./' + selected + '/{z}/{x}/{y}.' + ext, {
+            minZoom: 0, maxZoom: 5, noWrap: true, attribution: 'AL3MFALEH'
+        }).addTo(map);
+        tileLayer.on('tileerror', function() {
+            this.setUrl('https://gtamap.xyz/mapStyles/' + selected + '/{z}/{x}/{y}.' + ext);
+        });
+    }
+
+    changeMap();
+    map.setView([0, 0], 3);
+
+    function goToCoords(x, y, name) {
+        if (!x) x = parseFloat(document.getElementById('x_input').value);
+        if (!y) y = parseFloat(document.getElementById('y_input').value);
+        
+        if (!isNaN(x) && !isNaN(y)) {
+            var target = [y, x];
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(target).addTo(map)
+                .bindPopup(`<b>${name || 'موقع محدد'}</b><br>X: ${x} | Y: ${y}`).openPopup();
+            map.flyTo(target, 5);
+        }
+    }
+
+    map.on('click', function(e) {
+        if (marker) map.removeLayer(marker);
+        var x = e.latlng.lng.toFixed(3);
+        var y = e.latlng.lat.toFixed(3);
+        document.getElementById('x_input').value = x;
+        document.getElementById('y_input').value = y;
+        marker = L.marker(e.latlng).addTo(map)
+            .bindPopup(`X: ${x} | Y: ${y}`).openPopup();
+    });
+
+    function saveLocation() {
+        var name = document.getElementById('name_input').value || "بدون اسم";
+        var x = document.getElementById('x_input').value;
+        var y = document.getElementById('y_input').value;
+
+        if (!x || !y) return alert("اختر موقعاً أولاً");
+
+        var locations = JSON.parse(localStorage.getItem('gta_locations') || '[]');
+        locations.push({ name: name, x: x, y: y });
+        localStorage.setItem('gta_locations', JSON.stringify(locations));
+        
+        document.getElementById('name_input').value = "";
+        displaySaved();
+    }
+
+    function displaySaved() {
+        var list = document.getElementById('savedList');
+        var locations = JSON.parse(localStorage.getItem('gta_locations') || '[]');
+        
+        list.innerHTML = '<label style="color: #ffffff;">المواقع المحفوظة:</label>';
+        
+        locations.forEach((loc, index) => {
+            var item = document.createElement('div');
+            item.className = 'saved-item';
+            item.onclick = () => { goToCoords(parseFloat(loc.x), parseFloat(loc.y), loc.name); };
+            
+            item.innerHTML = `
+                <div class="saved-info">
+                    <span class="saved-name">${loc.name}</span>
+                    <span style="color:#777; direction: ltr;">${loc.x}, ${loc.y}</span>
+                </div>
+                <button class="btn-delete" onclick="deleteLoc(event, ${index})">×</button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function deleteLoc(event, index) {
+        event.stopPropagation();
+        var locations = JSON.parse(localStorage.getItem('gta_locations') || '[]');
+        locations.splice(index, 1);
+        localStorage.setItem('gta_locations', JSON.stringify(locations));
+        displaySaved();
+    }
+
+    displaySaved();
+</script>
+</body>
+</html>
