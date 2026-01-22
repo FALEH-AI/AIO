@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>AL3MFALEH AIO Tool 🚀</title>
+    <title>AL3MFALEH AIO Tool | 🚀</title>
     <style>
         :root {
             --bg: #0a0a0b;
@@ -11,53 +11,82 @@
             --border: #24283b;
             --text: #a9b1d6;
             --purple: #7d5fff;
+            --green: #2ecc71;
+            --orange: #e67e22;
         }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; }
         
         .sidebar {
-            position: fixed; right: 0; top: 0; bottom: 0; width: 70px; 
+            position: fixed; right: 0; top: 0; bottom: 0; width: 80px; 
             background: var(--sidebar-bg); display: flex; flex-direction: column; 
-            align-items: center; padding-top: 25px; border-left: 1px solid var(--border); z-index: 9999;
+            align-items: center; padding-top: 20px; border-left: 1px solid var(--border); z-index: 9999;
         }
 
         .nav-item {
-            width: 50px; height: 50px; margin-bottom: 20px; background: #1a1b26; 
+            width: 50px; height: 50px; margin-bottom: 15px; background: #1a1b26; 
             border-radius: 12px; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; font-size: 24px; transition: 0.3s; position: relative;
-            border: 1px solid transparent;
+            cursor: pointer; transition: 0.3s; position: relative; font-size: 20px;
+            border: 1px solid var(--border);
         }
 
-        .nav-item:hover { border-color: var(--accent); background: #24283b; }
-        .nav-item.active { background: var(--accent); color: #1a1b26; box-shadow: 0 0 15px rgba(122, 162, 247, 0.4); }
-        .nav-item.shop-active { background: var(--purple); color: white; box-shadow: 0 0 15px rgba(125, 95, 255, 0.4); }
+        .nav-item:hover { background: var(--accent); color: white; transform: scale(1.1); }
+        .nav-item.active { background: var(--accent); color: white; box-shadow: 0 0 15px rgba(122, 162, 247, 0.4); }
 
-        /* Tooltip */
         .nav-item::after {
-            content: attr(data-title); position: absolute; right: 80px; 
-            background: #1a1b26; color: white; padding: 5px 12px; border-radius: 6px;
-            font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none;
-            transition: 0.2s; border: 1px solid var(--border);
+            content: attr(data-title);
+            position: absolute; right: 85px; background: #1a1b26; color: white;
+            padding: 5px 10px; border-radius: 5px; font-size: 12px; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: 0.2s; border: 1px solid var(--border);
         }
-        .nav-item:hover::after { opacity: 1; right: 75px; }
+        .nav-item:hover::after { opacity: 1; right: 80px; }
 
-        .content { margin-right: 70px; height: 100vh; background: var(--bg); }
+        .content { margin-right: 80px; height: 100vh; position: relative; }
         iframe { width: 100%; height: 100%; border: none; display: none; }
         iframe.active { display: block; }
 
-        .credits { margin-top: auto; margin-bottom: 20px; font-size: 10px; color: #565f89; font-weight: bold; text-align: center; }
+        /* منطقة الحقوق والأزرار السفلية */
+        .bottom-section {
+            margin-top: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 15px;
+        }
+
+        .credits { 
+            font-size: 10px; 
+            color: #444; 
+            font-weight: bold; 
+            text-align: center;
+            width: 100%;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        .btn-export { color: var(--green); border-color: var(--green); }
+        .btn-import { color: var(--orange); border-color: var(--orange); }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
-        <div class="nav-item active" onclick="switchTool('finding', this)" data-title="البحث والحصر">📂</div>
-        <div class="nav-item" onclick="switchTool('generator', this)" data-title="مولد التريجرات">🛠️</div>
-        <div class="nav-item" onclick="switchTool('shops', this)" data-title="مولد المتاجر" style="color: var(--purple);">🛒</div>
-        
+        <div class="nav-item active" onclick="switchTool('finding', this)" data-title="بحث التريقرات">📂</div>
+        <div class="nav-item" onclick="switchTool('generator', this)" data-title="صانع التريقرات">🛠️</div>
+        <div class="nav-item" onclick="switchTool('shops', this)" data-title="صانع المتاجر" style="color: var(--purple);">🛒</div>
         <div class="nav-item" onclick="switchTool('checker', this)" data-title="فاحص السيرفرات">🔍</div>
         <div class="nav-item" onclick="switchTool('active', this)" data-title="حالة التريجر">🚀</div>
         <div class="nav-item" onclick="switchTool('map', this)" data-title="خريطة المواقع">📍</div>
-        
-        <div class="credits">AL3MFALEH</div>
+
+        <div class="bottom-section">
+            <div class="nav-item btn-export" onclick="exportData()" data-title="حفظ كل بياناتي">💾</div>
+            
+            <div class="nav-item btn-import" onclick="document.getElementById('importInput').click()" data-title="استيراد بياناتك">📥</div>
+            <input type="file" id="importInput" style="display:none" accept=".json" onchange="importData(event)">
+            
+            <div class="credits">AL3MFALEH ©</div>
+        </div>
     </div>
 
     <div class="content">
@@ -71,15 +100,44 @@
 
     <script>
         function switchTool(id, btn) {
-            // إخفاء كافة الإطارات
             document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
-            // إزالة الحالة النشطة من الأزرار
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-
-            // إظهار الإطار المطلوب
-            document.getElementById('frame-' + id).classList.add('active');
-            // تفعيل الزر
+            const target = document.getElementById('frame-' + id);
+            if(target) target.classList.add('active');
             btn.classList.add('active');
+        }
+
+        // وظيفة حفظ (تصدير) البيانات
+        function exportData() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                data[key] = localStorage.getItem(key);
+            }
+            if (Object.keys(data).length === 0) return alert("لا توجد بيانات لحفظها!");
+
+            const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "AL3MFALEH_DATA.json";
+            a.click();
+        }
+
+        // وظيفة رفع (استيراد) البيانات
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (confirm("سيتم دمج الملف المرفوع مع بياناتك الحالية وتحديث الصفحة. هل أنت متأكد؟")) {
+                        Object.keys(json).forEach(k => localStorage.setItem(k, json[k]));
+                        window.location.reload();
+                    }
+                } catch (err) { alert("❌ خطأ: الملف غير صالح!"); }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
