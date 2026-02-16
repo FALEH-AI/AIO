@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>AL3MFALEH | FiveM Dev Tool 🚀</title>
     <style>
-        :root { --bg: #0a0a0b; --card: #1a1b26; --text: #a9b1d6; --accent: #7aa2f7; --green: #9ece6a; --red: #f7768e; --orange: #ff9e64; --info: #bb9af7; }
+        :root { --bg: #0a0a0b; --card: #1a1b26; --text: #a9b1d6; --accent: #7aa2f7; --green: #9ece6a; --red: #f7768e; --orange: #ff9e64; --info: #bb9af7; --chain: #e0af68; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .main-layout { display: flex; gap: 20px; width: 100%; max-width: 1200px; align-items: flex-start; }
         .right-side { flex: 1.5; display: flex; flex-direction: column; gap: 20px; }
@@ -29,7 +29,6 @@
         .btn-del { background-color: var(--red); color: #ffffff; }
         .btn-edit { background-color: var(--info); color: #000; }
         .disabled { display: none; }
-        .hint { font-size: 10px; color: var(--info); margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body onload="initApp()">
@@ -39,10 +38,21 @@
         <div class="container">
             <h2>🛠️ مولد التريجرات الاحترافي | AL3MFALEH</h2>
             <div class="row">
-                <div style="flex:2"><label>اسم التريجر:</label><input type="text" id="eventName" placeholder="esx:giveInventoryItem"></div>
-                <div><label>المعطيات (Params):</label><input type="text" id="params" placeholder="pID, 'item', vID"></div>
+                <div style="flex:2"><label>اسم التريجر الأول:</label><input type="text" id="eventName" placeholder="esx:giveInventoryItem"></div>
+                <div><label>المعطيات (Params):</label><input type="text" id="params" placeholder="pID, 'bread', 1"></div>
             </div>
-            <div><label>شرح التريجر (يظهر في الديسكورد):</label><textarea id="eventDesc" placeholder="اكتب هنا وظيفة التريجر..."></textarea></div>
+            <div><label>شرح التريجر:</label><textarea id="eventDesc" placeholder="اكتب هنا وظيفة التريجر..."></textarea></div>
+
+            <div class="switch-box" style="border-right: 3px solid var(--chain);">
+                <div class="flex-label"><label style="color:var(--chain)">🔗 تريجر تابع (Chain Trigger)</label><input type="checkbox" id="useChain" onchange="toggleFields()"></div>
+                <div id="chainInputs" class="disabled">
+                    <div class="row">
+                        <div style="flex:2"><label>اسم التريجر الثاني:</label><input type="text" id="chainName" placeholder="chat:addMessage"></div>
+                        <div><label>المعطيات:</label><input type="text" id="chainParams" placeholder="'تم'"></div>
+                    </div>
+                    <div><label>انتظار قبل التريجر الثاني (ms):</label><input type="number" id="chainWait" value="0" placeholder="0 = لا يوجد انتظار"></div>
+                </div>
+            </div>
 
             <div class="switch-box">
                 <div class="flex-label"><label style="color:var(--green)">⌨️ تشغيل بضغط زر</label><input type="checkbox" id="useKey" onchange="toggleFields()"></div>
@@ -53,7 +63,7 @@
                 <div class="flex-label"><label style="color:var(--orange)">🔄 تكرار عام (Global Loop)</label><input type="checkbox" id="useLoop" onchange="toggleFields()"></div>
                 <div id="loopInputs" class="row disabled">
                     <div><label>المرات:</label><input type="number" id="loopCount" value="10"></div>
-                    <div><label>الانتظار (ms):</label><input type="number" id="delay" value="100"></div>
+                    <div><label>الانتظار بين المرات (ms):</label><input type="number" id="delay" value="100"></div>
                 </div>
             </div>
 
@@ -66,7 +76,7 @@
                         <label style="font-size: 11px;">نطاق vID (من - إلى):</label>
                         <div class="row"><input type="number" id="seqFrom" value="1"><input type="number" id="seqTo" value="50"></div>
                     </div>
-                    <div class="flex-label" style="margin-top:10px"><label style="font-size: 11px; color: #9ece6a;">⏳ انتظار (Wait) داخل النطاق:</label><input type="checkbox" id="useRangeWait" checked></div>
+                    <div class="flex-label" style="margin-top:10px"><label style="font-size: 11px; color: #9ece6a;">⏳ انتظار داخل النطاق (Wait):</label><input type="checkbox" id="useRangeWait" checked></div>
                     <input type="number" id="rangeWaitMs" value="50">
                 </div>
             </div>
@@ -95,14 +105,12 @@
     let savedFiles = JSON.parse(localStorage.getItem('savedFiles')) || [];
     let editId = null;
     let isEditingWebhook = false;
-    const DEFAULT_WEBHOOK = "https://discord.com/api/webhooks/1457948265982070837/sHmtRLLGr7t3Q6eCjE652iYRpSFWzX_A4twQl9MIPj3vVv_f1hm_r8_B6gvCIe3-E2Q2";
 
     function initApp() { 
         renderTriggers(); 
         renderFiles();
         toggleFields(); 
-        if (!localStorage.getItem('masterWebhook')) localStorage.setItem('masterWebhook', DEFAULT_WEBHOOK);
-        document.getElementById('webhookUrl').value = localStorage.getItem('masterWebhook');
+        document.getElementById('webhookUrl').value = localStorage.getItem('masterWebhook') || "https://discord.com/api/webhooks/...";
     }
 
     function toggleFields() {
@@ -110,6 +118,7 @@
         document.getElementById('loopInputs').style.display = document.getElementById('useLoop').checked ? 'flex' : 'none';
         document.getElementById('rangeInputs').className = document.getElementById('useRange').checked ? '' : 'disabled';
         document.getElementById('sequentialSettings').className = document.getElementById('useSequential').checked ? '' : 'disabled';
+        document.getElementById('chainInputs').className = document.getElementById('useChain').checked ? '' : 'disabled';
     }
 
     function generateLua(t) {
@@ -117,23 +126,33 @@
         let p = t.params ? t.params.trim() : "";
         p = p.replace(/\bpID\b/gi, "pID").replace(/\bvID\b/gi, "vID");
         
-        // التحقق مما إذا كان الكود يحتاج لـ Thread
-        const needsThread = t.useKey || t.useLoop || t.useRange;
-        let indent = "";
-        if (needsThread) indent = t.useKey ? "            " : "        ";
-        
+        // بناء منطق التريجر الأول
         let coreLogic = `TriggerServerEvent('${safeName}'${p ? ', '+p : ''})`;
+        
+        // إضافة التريجر الثاني مع الانتظار إذا تم تفعيله
+        if (t.useChain && t.chainName) {
+            const safeChain = t.chainName.replace(/"/g, "'");
+            let cp = t.chainParams ? t.chainParams.trim() : "";
+            cp = cp.replace(/\bpID\b/gi, "pID").replace(/\bvID\b/gi, "vID");
+            
+            if (t.chainWait > 0) coreLogic += `\n        Citizen.Wait(${t.chainWait})`;
+            coreLogic += `\n        TriggerServerEvent('${safeChain}'${cp ? ', '+cp : ''})`;
+        }
+
+        const needsThread = t.useKey || t.useLoop || t.useRange;
+        let indent = needsThread ? (t.useKey ? "            " : "        ") : "";
+        
         if (t.useRangeWait && t.useRange) coreLogic += `\n${indent}        Citizen.Wait(${t.rangeWaitMs})`;
 
         let logic = "";
         if (t.useRange) {
             if (t.useSequential) {
-                logic = `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    for vID = ${t.seqFrom}, ${t.seqTo} do\n${indent}        ${coreLogic}\n${indent}    end\n${indent}end`;
+                logic = `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    for vID = ${t.seqFrom}, ${t.seqTo} do\n${indent}        ${coreLogic.replace(/\n/g, '\n' + indent + '        ')}\n${indent}    end\n${indent}end`;
             } else {
-                logic = `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    ${coreLogic}\n${indent}end`;
+                logic = `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    ${coreLogic.replace(/\n/g, '\n' + indent + '    ')}\n${indent}end`;
             }
         } else {
-            logic = (needsThread ? indent : "") + coreLogic;
+            logic = indent + coreLogic.replace(/\n/g, '\n' + indent);
         }
 
         if (t.useLoop) {
@@ -146,42 +165,7 @@
         } else if (t.useLoop || t.useRange) {
             return `Citizen.CreateThread(function()\n${logic}\nend)`;
         } else {
-            // كود سادة بدون Thread
             return coreLogic;
-        }
-    }
-
-    function handleFileUpload(input) {
-        for (let f of input.files) {
-            const r = new FileReader();
-            r.onload = (e) => {
-                savedFiles.push({id: Date.now() + Math.random(), name: f.name, content: e.target.result});
-                localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
-                renderFiles();
-            };
-            r.readAsText(f);
-        }
-    }
-
-    function renderFiles() {
-        document.getElementById('fileList').innerHTML = savedFiles.map(f => `
-            <div class="file-item">
-                <span class="file-name">📄 ${f.name}</span>
-                <div class="actions"><button class="btn-copy" onclick="copyFileContent(${f.id})">نسخ</button><button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button></div>
-            </div>
-        `).join('');
-    }
-
-    function copyFileContent(id) {
-        const f = savedFiles.find(x => x.id === id);
-        navigator.clipboard.writeText(f.content).then(() => alert("تم نسخ محتوى الملف!"));
-    }
-
-    function deleteFile(id) {
-        if(confirm("حذف الملف؟")) {
-            savedFiles = savedFiles.filter(f => f.id !== id);
-            localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
-            renderFiles();
         }
     }
 
@@ -191,6 +175,10 @@
             name: document.getElementById('eventName').value || "Event",
             params: document.getElementById('params').value,
             desc: document.getElementById('eventDesc').value || "",
+            useChain: document.getElementById('useChain').checked,
+            chainName: document.getElementById('chainName').value,
+            chainParams: document.getElementById('chainParams').value,
+            chainWait: parseInt(document.getElementById('chainWait').value) || 0,
             useKey: document.getElementById('useKey').checked,
             controlId: document.getElementById('controlId').value,
             useLoop: document.getElementById('useLoop').checked,
@@ -216,9 +204,13 @@
         }
         localStorage.setItem('v22Triggers', JSON.stringify(triggers));
         renderTriggers();
-        document.getElementById('eventName').value = "";
-        document.getElementById('params').value = "";
-        document.getElementById('eventDesc').value = "";
+        clearInputs();
+    }
+
+    function clearInputs() {
+        ['eventName','params','eventDesc','chainName','chainParams','chainWait'].forEach(id => document.getElementById(id).value = id === 'chainWait' ? "0" : "");
+        ['useKey','useLoop','useRange','useSequential','useChain'].forEach(id => document.getElementById(id).checked = false);
+        toggleFields();
     }
 
     function loadToEdit(id) {
@@ -227,7 +219,12 @@
         document.getElementById('eventName').value = t.name;
         document.getElementById('params').value = t.params;
         document.getElementById('eventDesc').value = t.desc || "";
+        document.getElementById('useChain').checked = t.useChain || false;
+        document.getElementById('chainName').value = t.chainName || "";
+        document.getElementById('chainParams').value = t.chainParams || "";
+        document.getElementById('chainWait').value = t.chainWait || 0;
         document.getElementById('useKey').checked = t.useKey;
+        document.getElementById('controlId').value = t.controlId;
         document.getElementById('useLoop').checked = t.useLoop;
         document.getElementById('loopCount').value = t.loopCount;
         document.getElementById('delay').value = t.delay;
@@ -244,9 +241,9 @@
 
     function renderTriggers() {
         document.getElementById('triggerList').innerHTML = triggers.map(t => `
-            <div class="trigger-item">
-                <div class="item-header">
-                    <b>🚀 ${t.name}</b>
+            <div class="trigger-item" style="${t.useChain ? 'border-right-color: var(--chain)' : ''}">
+                <div class="item-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <b>🚀 ${t.name} ${t.useChain ? '<span style="color:var(--chain); font-size:10px;">[🔗 +1]</span>' : ''}</b>
                     <div class="actions">
                         <button class="btn-edit" onclick="loadToEdit(${t.id})">✏️</button>
                         <button style="background:var(--accent)" onclick="toggleInfo(${t.id})">📜</button>
@@ -267,21 +264,36 @@
         if (!isEditingWebhook) { input.disabled = false; input.focus(); btn.innerText = "✅"; isEditingWebhook = true; }
         else { localStorage.setItem('masterWebhook', input.value); input.disabled = true; btn.innerText = "✏️"; isEditingWebhook = false; }
     }
-
     function toggleInfo(id) { const el = document.getElementById(`info-${id}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     function copyTrigger(id) { navigator.clipboard.writeText(generateLua(triggers.find(t => t.id === id))).then(() => alert("تم النسخ!")); }
     function deleteTrigger(id) { triggers = triggers.filter(t => t.id !== id); localStorage.setItem('v22Triggers', JSON.stringify(triggers)); renderTriggers(); }
-    
+    function handleFileUpload(input) {
+        for (let f of input.files) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                savedFiles.push({id: Date.now() + Math.random(), name: f.name, content: e.target.result});
+                localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
+                renderFiles();
+            };
+            r.readAsText(f);
+        }
+    }
+    function renderFiles() {
+        document.getElementById('fileList').innerHTML = savedFiles.map(f => `
+            <div class="file-item"><span class="file-name">📄 ${f.name}</span><div class="actions"><button class="btn-copy" onclick="copyFileContent(${f.id})">نسخ</button><button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button></div></div>
+        `).join('');
+    }
+    function copyFileContent(id) { const f = savedFiles.find(x => x.id === id); navigator.clipboard.writeText(f.content).then(() => alert("تم نسخ محتوى الملف!")); }
+    function deleteFile(id) { if(confirm("حذف الملف؟")) { savedFiles = savedFiles.filter(f => f.id !== id); localStorage.setItem('savedFiles', JSON.stringify(savedFiles)); renderFiles(); } }
     async function sendToDiscord(id) {
         const url = localStorage.getItem('masterWebhook');
         const t = triggers.find(tr => tr.id === id);
+        if(!url || url.includes('...')) return alert("يرجى ضبط رابط الويب هوك أولاً!");
         const embed = {
-            title: "📡 Export Trigger | AL3MFALEH",
-            color: 7506394,
+            title: "📡 Export Trigger | AL3MFALEH", color: 7506394,
             fields: [{ name: "Event", value: `\`${t.name}\``, inline: true }, { name: "Description", value: t.desc || "---" }],
             description: "```lua\n" + generateLua(t) + "\n```",
-            footer: { text: "Dev Tool by AL3MFALEH" },
-            timestamp: new Date()
+            footer: { text: "Dev Tool by AL3MFALEH" }, timestamp: new Date()
         };
         await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [embed] }) });
         alert("تم الإرسال!");
