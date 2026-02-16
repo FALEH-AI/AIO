@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>AL3MFALEH | Sequence Dev Tool 🚀</title>
+    <title>AL3MFALEH | Ultimate Dev Tool 🚀</title>
     <style>
         :root { --bg: #0a0a0b; --card: #1a1b26; --text: #a9b1d6; --accent: #7aa2f7; --green: #9ece6a; --red: #f7768e; --orange: #ff9e64; --info: #bb9af7; --chain: #e0af68; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
@@ -19,7 +19,7 @@
         .flex-label { display: flex; justify-content: space-between; align-items: center; }
         button { padding: 8px 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
         .chain-item { background: #1f2335; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-right: 3px solid var(--chain); }
-        .btn-add-chain { background: var(--chain); color: #000; width: 100%; margin-top: 10px; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; background: #24283b; padding: 8px; margin-bottom: 8px; border-radius: 6px; border-right: 3px solid var(--orange); }
         .trigger-item { background-color: #24283b; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--accent); }
         .info-panel { background: #16161e; padding: 10px; border-radius: 6px; display: none; margin-top: 10px; font-size: 0.75rem; border: 1px solid #414868; color: #9ece6a; white-space: pre-wrap; font-family: monospace; }
         .actions { display: flex; gap: 5px; }
@@ -45,7 +45,7 @@
                 <div class="flex-label"><label style="color:var(--chain)">🔗 نظام السلسلة (Multi-Chain)</label><input type="checkbox" id="useChain" onchange="toggleFields()"></div>
                 <div id="chainContainer" class="disabled">
                     <div id="chainList"></div>
-                    <button class="btn-add-chain" onclick="addChainStep()">إضافة تريجر تابع آخر +</button>
+                    <button style="background:var(--chain); color:#000; width:100%" onclick="addChainStep()">إضافة تريجر تابع آخر +</button>
                 </div>
             </div>
 
@@ -58,16 +58,15 @@
                 <div class="flex-label"><label style="color:var(--orange)">🔄 تكرار عام (Global Loop)</label><input type="checkbox" id="useLoop" onchange="toggleFields()"></div>
                 <div id="loopInputs" class="row disabled">
                     <div><label>المرات:</label><input type="number" id="loopCount" value="10"></div>
-                    <div><label>انتظار التكرار (ms):</label><input type="number" id="delay" value="100"></div>
+                    <div><label>الانتظار (ms):</label><input type="number" id="delay" value="100"></div>
                 </div>
             </div>
 
             <div class="switch-box">
                 <div class="flex-label"><label style="color:var(--accent)">🎯 نطاق اللاعبين (Range pID)</label><input type="checkbox" id="useRange" onchange="toggleFields()"></div>
                 <div id="rangeInputs" class="disabled">
-                    <div class="row"><input type="number" id="idFrom" value="1" placeholder="ID من"><input type="number" id="idTo" value="10" placeholder="ID إلى"></div>
-                    <div class="flex-label" style="margin-top:10px"><label style="color: #9ece6a;">⏳ انتظار داخل النطاق (Wait):</label><input type="checkbox" id="useRangeWait" checked></div>
-                    <input type="number" id="rangeWaitMs" value="50">
+                    <div class="row"><input type="number" id="idFrom" value="1"><input type="number" id="idTo" value="10"></div>
+                    <div class="flex-label" style="margin-top:10px"><label style="color: #9ece6a;">⏳ انتظار النطاق:</label><input type="checkbox" id="useRangeWait" checked> <input type="number" id="rangeWaitMs" value="50" style="width:70px"></div>
                 </div>
             </div>
 
@@ -78,26 +77,34 @@
 
     <div class="left-side">
         <div class="container">
-            <h2>⚙️ الإعدادات</h2>
+            <h2>⚙️ الإعدادات والملفات</h2>
             <label>رابط الـ Webhook:</label>
             <div style="display:flex; gap:5px; margin-bottom:15px">
                 <input type="text" id="webhookUrl" disabled>
                 <button onclick="toggleWebhookEdit()" id="editWebhookBtn" style="background:var(--info)">✏️</button>
             </div>
-            <p style="font-size: 11px; color: #565f89;">ملاحظة: تأكد من ضبط الويب هوك ليتم إرسال الكود بنجاح.</p>
+            
+            <div style="border: 2px dashed #414868; padding: 15px; text-align: center; border-radius: 8px; background: #16161e;">
+                <input type="file" id="fileInput" style="display:none" onchange="handleFileUpload(this)" multiple>
+                <label for="fileInput" style="cursor:pointer; color:var(--accent); font-weight:bold;">رفع ملفات ➕</label>
+            </div>
+            <div id="fileList" style="margin-top:15px"></div>
         </div>
     </div>
 </div>
 
 <script>
-    let triggers = JSON.parse(localStorage.getItem('vChainTriggers')) || [];
+    // استرجاع البيانات مع دعم الإصدارات القديمة
+    let triggers = JSON.parse(localStorage.getItem('vChainTriggers')) || JSON.parse(localStorage.getItem('v22Triggers')) || [];
+    let savedFiles = JSON.parse(localStorage.getItem('savedFiles')) || [];
     let editId = null;
     let isEditingWebhook = false;
 
     function initApp() { 
         renderTriggers(); 
+        renderFiles();
         toggleFields(); 
-        document.getElementById('webhookUrl').value = localStorage.getItem('masterWebhook') || "https://discord.com/api/webhooks/...";
+        document.getElementById('webhookUrl').value = localStorage.getItem('masterWebhook') || "";
     }
 
     function toggleFields() {
@@ -110,16 +117,8 @@
     function addChainStep(name = '', params = '', wait = 0) {
         const div = document.createElement('div');
         div.className = 'chain-item';
-        div.innerHTML = `
-            <div class="row">
-                <div style="flex:2"><label>الحدث:</label><input type="text" class="c-name" value="${name}"></div>
-                <div><label>المعطيات:</label><input type="text" class="c-params" value="${params}"></div>
-            </div>
-            <div class="row">
-                <div><label>انتظار (ms):</label><input type="number" class="c-wait" value="${wait}"></div>
-                <div style="flex:0; align-self:flex-end;"><button class="btn-del" onclick="this.parentElement.parentElement.parentElement.remove()">❌</button></div>
-            </div>
-        `;
+        div.innerHTML = `<div class="row"><div><input type="text" class="c-name" placeholder="الحدث" value="${name}"></div><div><input type="text" class="c-params" placeholder="المعطيات" value="${params}"></div></div>
+            <div class="row"><div><input type="number" class="c-wait" placeholder="انتظار ms" value="${wait}"></div><button class="btn-del" onclick="this.parentElement.parentElement.remove()">❌</button></div>`;
         document.getElementById('chainList').appendChild(div);
     }
 
@@ -127,10 +126,7 @@
         const indent = (t.useKey ? "            " : (t.useLoop || t.useRange ? "        " : ""));
         let code = `TriggerServerEvent('${t.name}'${t.params ? ', '+t.params : ''})`;
         if (t.useChain && t.chainSteps) {
-            t.chainSteps.forEach(step => {
-                if(step.wait > 0) code += `\n${indent}Citizen.Wait(${step.wait})`;
-                code += `\n${indent}TriggerServerEvent('${step.name}'${step.params ? ', '+step.params : ''})`;
-            });
+            t.chainSteps.forEach(s => { if(s.wait > 0) code += `\n${indent}Citizen.Wait(${s.wait})`; code += `\n${indent}TriggerServerEvent('${s.name}'${s.params ? ', '+s.params : ''})`; });
         }
         if (t.useRangeWait && t.useRange) code += `\n${indent}Citizen.Wait(${t.rangeWaitMs})`;
         let logic = t.useRange ? `${indent}for pID = ${t.idFrom}, ${t.idTo} do\n${indent}    ${code.replace(/\n/g, '\n    ')}\n${indent}end` : indent + code;
@@ -147,45 +143,26 @@
             chainSteps.push({ name: item.querySelector('.c-name').value, params: item.querySelector('.c-params').value, wait: parseInt(item.querySelector('.c-wait').value) || 0 });
         });
         const data = {
-            id: editId || Date.now(),
-            name: document.getElementById('eventName').value,
-            params: document.getElementById('params').value,
-            useChain: document.getElementById('useChain').checked,
-            chainSteps: chainSteps,
-            useKey: document.getElementById('useKey').checked,
-            controlId: document.getElementById('controlId').value,
-            useLoop: document.getElementById('useLoop').checked,
-            loopCount: document.getElementById('loopCount').value,
-            delay: document.getElementById('delay').value,
-            useRange: document.getElementById('useRange').checked,
-            idFrom: document.getElementById('idFrom').value,
-            idTo: document.getElementById('idTo').value,
-            useRangeWait: document.getElementById('useRangeWait').checked,
-            rangeWaitMs: document.getElementById('rangeWaitMs').value
+            id: editId || Date.now(), name: document.getElementById('eventName').value, params: document.getElementById('params').value,
+            useChain: document.getElementById('useChain').checked, chainSteps: chainSteps,
+            useKey: document.getElementById('useKey').checked, controlId: document.getElementById('controlId').value,
+            useLoop: document.getElementById('useLoop').checked, loopCount: document.getElementById('loopCount').value, delay: document.getElementById('delay').value,
+            useRange: document.getElementById('useRange').checked, idFrom: document.getElementById('idFrom').value, idTo: document.getElementById('idTo').value,
+            useRangeWait: document.getElementById('useRangeWait').checked, rangeWaitMs: document.getElementById('rangeWaitMs').value
         };
-        if (editId) { const idx = triggers.findIndex(x => x.id === editId); triggers[idx] = data; editId = null; document.getElementById('saveBtn').innerText = "حفظ التريجر ✅"; }
+        if (editId) { triggers[triggers.findIndex(x => x.id === editId)] = data; editId = null; document.getElementById('saveBtn').innerText = "حفظ التريجر ✅"; }
         else { triggers.push(data); }
         localStorage.setItem('vChainTriggers', JSON.stringify(triggers));
         clearInputs(); renderTriggers();
     }
 
     function loadToEdit(id) {
-        const t = triggers.find(x => x.id === id);
-        editId = t.id;
-        document.getElementById('eventName').value = t.name;
-        document.getElementById('params').value = t.params;
-        document.getElementById('useChain').checked = t.useChain;
-        document.getElementById('chainList').innerHTML = "";
+        const t = triggers.find(x => x.id === id); editId = t.id;
+        document.getElementById('eventName').value = t.name; document.getElementById('params').value = t.params;
+        document.getElementById('useChain').checked = t.useChain; document.getElementById('chainList').innerHTML = "";
         if(t.chainSteps) t.chainSteps.forEach(s => addChainStep(s.name, s.params, s.wait));
-        document.getElementById('useKey').checked = t.useKey;
-        document.getElementById('controlId').value = t.controlId;
-        document.getElementById('useLoop').checked = t.useLoop;
-        document.getElementById('loopCount').value = t.loopCount;
-        document.getElementById('delay').value = t.delay;
-        document.getElementById('useRange').checked = t.useRange;
-        document.getElementById('idFrom').value = t.idFrom;
-        document.getElementById('idTo').value = t.idTo;
-        document.getElementById('saveBtn').innerText = "تحديث التريجر 💾";
+        document.getElementById('useKey').checked = t.useKey; document.getElementById('useLoop').checked = t.useLoop;
+        document.getElementById('useRange').checked = t.useRange; document.getElementById('saveBtn').innerText = "تحديث التريجر 💾";
         toggleFields(); window.scrollTo(0,0);
     }
 
@@ -193,7 +170,7 @@
         document.getElementById('triggerList').innerHTML = triggers.map(t => `
             <div class="trigger-item">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b>🚀 ${t.name} ${t.useChain ? `<small style="color:var(--chain)">+${t.chainSteps.length}</small>` : ''}</b>
+                    <b>🚀 ${t.name}</b>
                     <div class="actions">
                         <button class="btn-edit" onclick="loadToEdit(${t.id})">✏️</button>
                         <button style="background:var(--accent)" onclick="toggleInfo(${t.id})">📜</button>
@@ -203,46 +180,48 @@
                     </div>
                 </div>
                 <div id="info-${t.id}" class="info-panel">${generateLua(t)}</div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
 
-    function clearInputs() {
-        document.getElementById('eventName').value = ""; document.getElementById('params').value = "";
-        document.getElementById('chainList').innerHTML = "";
-        ['useChain','useKey','useLoop','useRange'].forEach(id => document.getElementById(id).checked = false);
-        toggleFields();
+    // إدارة الملفات
+    function handleFileUpload(input) {
+        for (let f of input.files) {
+            const r = new FileReader();
+            r.onload = (e) => {
+                savedFiles.push({id: Date.now() + Math.random(), name: f.name, content: e.target.result});
+                localStorage.setItem('savedFiles', JSON.stringify(savedFiles));
+                renderFiles();
+            };
+            r.readAsText(f);
+        }
     }
+    function renderFiles() {
+        document.getElementById('fileList').innerHTML = savedFiles.map(f => `
+            <div class="file-item"><span>📄 ${f.name}</span><div class="actions">
+            <button class="btn-copy" onclick="copyFile(${f.id})">نسخ</button>
+            <button class="btn-del" onclick="deleteFile(${f.id})">🗑️</button></div></div>`).join('');
+    }
+    function copyFile(id) { navigator.clipboard.writeText(savedFiles.find(x => x.id === id).content); alert("تم نسخ الملف!"); }
+    function deleteFile(id) { savedFiles = savedFiles.filter(x => x.id !== id); localStorage.setItem('savedFiles', JSON.stringify(savedFiles)); renderFiles(); }
 
     function toggleWebhookEdit() {
         const input = document.getElementById('webhookUrl');
-        const btn = document.getElementById('editWebhookBtn');
-        if (!isEditingWebhook) { input.disabled = false; input.focus(); btn.innerText = "✅"; isEditingWebhook = true; }
-        else { localStorage.setItem('masterWebhook', input.value); input.disabled = true; btn.innerText = "✏️"; isEditingWebhook = false; }
+        if (!isEditingWebhook) { input.disabled = false; input.focus(); document.getElementById('editWebhookBtn').innerText = "✅"; isEditingWebhook = true; }
+        else { localStorage.setItem('masterWebhook', input.value); input.disabled = true; document.getElementById('editWebhookBtn').innerText = "✏️"; isEditingWebhook = false; }
     }
 
     async function sendToDiscord(id) {
         const url = localStorage.getItem('masterWebhook');
-        if(!url || url.includes('...')) return alert("يرجى ضبط رابط الويب هوك في الإعدادات!");
         const t = triggers.find(tr => tr.id === id);
-        const embed = {
-            title: "📡 Sequence Export | AL3MFALEH", color: 7506394,
-            fields: [
-                { name: "Main Event", value: `\`${t.name}\``, inline: true },
-                { name: "Steps", value: t.useChain ? `${t.chainSteps.length + 1} events` : "1 event", inline: true }
-            ],
-            description: "```lua\n" + generateLua(t) + "\n```",
-            footer: { text: "Dev Tool by AL3MFALEH" }, timestamp: new Date()
-        };
-        try {
-            await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [embed] }) });
-            alert("تم الإرسال بنجاح 🚀");
-        } catch(e) { alert("خطأ في الإرسال، تحقق من الرابط"); }
+        const embed = { title: "📡 Export | AL3MFALEH", description: "```lua\n" + generateLua(t) + "\n```", color: 7506394 };
+        await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ embeds: [embed] }) });
+        alert("تم الإرسال!");
     }
 
+    function clearInputs() { document.getElementById('eventName').value = ""; document.getElementById('params').value = ""; document.getElementById('chainList').innerHTML = ""; toggleFields(); }
     function toggleInfo(id) { const el = document.getElementById(`info-${id}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-    function copyCode(id) { navigator.clipboard.writeText(generateLua(triggers.find(x => x.id === id))).then(() => alert("تم النسخ!")); }
-    function deleteT(id) { if(confirm("حذف؟")) { triggers = triggers.filter(x => x.id !== id); localStorage.setItem('vChainTriggers', JSON.stringify(triggers)); renderTriggers(); } }
+    function copyCode(id) { navigator.clipboard.writeText(generateLua(triggers.find(x => x.id === id))); alert("تم النسخ!"); }
+    function deleteT(id) { triggers = triggers.filter(x => x.id !== id); localStorage.setItem('vChainTriggers', JSON.stringify(triggers)); renderTriggers(); }
 </script>
 </body>
 </html>
