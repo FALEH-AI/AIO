@@ -13,6 +13,7 @@
             --purple: #7d5fff;
             --green: #2ecc71;
             --orange: #e67e22;
+            --pink: #ff9ff3;
         }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', sans-serif; }
         
@@ -44,7 +45,6 @@
         iframe { width: 100%; height: 100%; border: none; display: none; }
         iframe.active { display: block; }
 
-        /* منطقة الحقوق والأزرار السفلية */
         .bottom-section {
             margin-top: auto;
             width: 100%;
@@ -72,30 +72,32 @@
 <body>
 
     <div class="sidebar">
-        <div class="nav-item active" onclick="switchTool('finding', this)" data-title="بحث التريقرات">📂</div>
-        <div class="nav-item" onclick="switchTool('generator', this)" data-title="صانع التريقرات">🛠️</div>
+        <div class="nav-item active" onclick="switchTool('generator', this)" data-title="صانع التريقرات">🛠️</div>
         <div class="nav-item" onclick="switchTool('shops', this)" data-title="صانع المتاجر" style="color: var(--purple);">🛒</div>
+        <div class="nav-item" onclick="switchTool('finding', this)" data-title="بحث التريقرات">📂</div>
+        
         <div class="nav-item" onclick="switchTool('checker', this)" data-title="فاحص السيرفرات">🔍</div>
         <div class="nav-item" onclick="switchTool('active', this)" data-title="حالة التريجر">🚀</div>
         <div class="nav-item" onclick="switchTool('map', this)" data-title="خريطة المواقع">📍</div>
+        <div class="nav-item" onclick="switchTool('webhook', this)" data-title="مرسل ويب هوك" style="color: var(--pink);">📧</div>
 
         <div class="bottom-section">
             <div class="nav-item btn-export" onclick="exportData()" data-title="حفظ كل بياناتي">💾</div>
-            
             <div class="nav-item btn-import" onclick="document.getElementById('importInput').click()" data-title="استيراد بياناتك">📥</div>
             <input type="file" id="importInput" style="display:none" accept=".json" onchange="importData(event)">
-            
             <div class="credits">AL3MFALEH ©</div>
         </div>
     </div>
 
     <div class="content">
-        <iframe id="frame-finding" src="tools/Triggers Finding.html" class="active"></iframe>
-        <iframe id="frame-generator" src="tools/trigger tool.html"></iframe>
+        <iframe id="frame-generator" src="tools/trigger tool.html" class="active"></iframe>
         <iframe id="frame-shops" src="tools/shops_maker.HTML"></iframe>
+        <iframe id="frame-finding" src="tools/Triggers Finding.html"></iframe>
+        
         <iframe id="frame-checker" src="tools/checker SERVER.html"></iframe>
         <iframe id="frame-active" src="tools/active trigger.html"></iframe>
         <iframe id="frame-map" src="tools/MAP_AL3MFALEH.html"></iframe>
+        <iframe id="frame-webhook" src="tools/WEBHOOKSEND.html"></iframe>
     </div>
 
     <script>
@@ -107,7 +109,6 @@
             btn.classList.add('active');
         }
 
-        // وظيفة حفظ (تصدير) البيانات
         function exportData() {
             const data = {};
             for (let i = 0; i < localStorage.length; i++) {
@@ -123,7 +124,6 @@
             a.click();
         }
 
-        // وظيفة رفع (استيراد) البيانات
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
