@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhooks Pro</title>
+    <title>Webhooks Pro | Canary Support</title>
     <style>
         :root {
             --bg-dark: #0d1117;
@@ -13,166 +13,156 @@
             --accent-blue: #58a6ff;
             --accent-green: #238636;
             --accent-red: #da3633;
+            --accent-yellow: #d29922;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark); color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 20px;
         }
 
         .container {
-            background: var(--panel-dark);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 600px;
-            border: 1px solid var(--border-color);
+            background: var(--panel-dark); padding: 25px; border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5); width: 100%; max-width: 600px; border: 1px solid var(--border-color);
         }
 
         h2 { text-align: center; color: var(--accent-blue); margin-top: 0; }
-
         label { font-size: 0.85em; color: #8b949e; display: block; margin-top: 12px; }
 
+        .input-wrapper { position: relative; }
+
         input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-dark);
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.2s;
+            width: 100%; padding: 12px; margin-top: 5px; border-radius: 6px;
+            border: 1px solid var(--border-color); background: var(--bg-dark); color: white; box-sizing: border-box; outline: none;
         }
 
-        input:focus { border-color: var(--accent-blue); }
+        .status-dot {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            width: 10px; height: 10px; border-radius: 50%; background: #444; transition: 0.3s;
+        }
 
-        /* معاينة الصورة */
         .avatar-preview {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            margin-top: 10px;
-            background-size: cover;
-            background-position: center;
-            display: inline-block;
-            vertical-align: middle;
+            width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--border-color);
+            background-size: cover; background-position: center; flex-shrink: 0;
+            background-image: url('https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png');
         }
 
+        .row { display: flex; gap: 12px; align-items: flex-end; }
+        
         .btn-send {
-            background: var(--accent-green);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1.1em;
+            background: var(--accent-green); color: white; border: none; padding: 15px; width: 100%; 
+            font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 1.1em;
+            transition: 0.3s;
         }
 
-        #taskLogs { width: 100%; max-width: 600px; margin-top: 25px; }
-
+        .status-msg { font-size: 0.75em; margin-top: 5px; display: block; }
         .log-entry {
-            background: var(--panel-dark);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-right: 5px solid var(--accent-blue);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            border-right-width: 5px;
+            background: var(--panel-dark); padding: 12px; border-radius: 8px; margin-top: 10px;
+            border: 1px solid var(--border-color); border-right: 5px solid var(--accent-blue);
+            display: flex; justify-content: space-between; align-items: center;
         }
-
-        .btn-mini { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; color: white; }
-        .stop-mini { background: var(--accent-red); }
-        .delete-mini { background: #484f58; }
-        .hidden { display: none; }
-        .row { display: flex; gap: 15px; align-items: flex-end; }
     </style>
 </head>
-<body>
+<body onload="loadLastWebhook()">
 
 <div class="container">
     <h2>🎭 WEBHOOKS FUCKER</h2>
     
-    <label>رابط الويب هوك</label>
-    <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+    <label>رابط الويب هوك (عادي أو كناري)</label>
+    <div class="input-wrapper">
+        <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." oninput="checkWebhook(this.value)">
+        <div id="statusDot" class="status-dot"></div>
+    </div>
+    <span id="statusMessage" class="status-msg" style="color: #8b949e;">يرجى التحقق من الرابط...</span>
 
-    <div class="row">
+    <div class="row" style="margin-top: 10px;">
         <div style="flex: 1;">
             <label>اسم البوت</label>
-            <input type="text" id="botName" placeholder="Bot Name">
+            <input type="text" id="botName" placeholder="Admin Bot">
         </div>
-        <div style="flex: 1;">
-            <label>رابط الصورة (Avatar URL)</label>
-            <input type="text" id="botAvatar" placeholder="يجب أن ينتهي بـ .jpg أو .png" oninput="updatePreview(this.value)">
+        <div style="flex: 1.2;">
+            <label>رابط الصورة (Avatar)</label>
+            <input type="text" id="botAvatar" placeholder="رابط مباشر .png أو .jpg" oninput="updateAvatarPreview(this.value)">
         </div>
-        <div id="previewImg" class="avatar-preview" style="background-image: url('https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png');"></div>
-    </div>
-
-    <div class="row">
-        <div style="flex: 1;">
-            <label>نوع المنشن</label>
-            <select id="mentionType" onchange="toggleRoleInput()">
-                <option value="none">بدون</option>
-                <option value="everyone">@everyone</option>
-                <option value="here">@here</option>
-                <option value="role">رتبة (ID)</option>
-            </select>
-        </div>
-        <div id="idInputContainer" style="flex: 1;" class="hidden">
-            <label>الـ ID</label>
-            <input type="text" id="targetId">
-        </div>
+        <div id="avatarPreview" class="avatar-preview"></div>
     </div>
 
     <div class="row">
         <div style="flex: 1;">
             <label>عدد الرسائل</label>
-            <input type="number" id="count" value="5">
+            <input type="number" id="count" value="10">
         </div>
         <div style="flex: 1;">
-            <label>التأخير (ثواني)</label>
-            <input type="number" id="delay" value="1" step="0.1">
+            <label>التأخير (ثانية)</label>
+            <input type="number" id="delay" value="0.8" step="0.1">
         </div>
     </div>
 
     <label>الرسالة</label>
     <textarea id="message" rows="2" placeholder="اكتب رسالتك..."></textarea>
 
-    <button class="btn-send" onclick="createNewTask()">إرسال 🚀</button>
+    <button id="mainSendBtn" class="btn-send" onclick="createNewTask()" disabled style="opacity: 0.5; cursor: not-allowed;">بدء الإرسال 🚀</button>
 </div>
 
-<div id="taskLogs"></div>
+<div id="taskLogs" style="width: 100%; max-width: 600px; margin-top: 20px;"></div>
 
 <script>
-    // وظيفة معاينة الصورة للتأكد من الرابط
-    function updatePreview(url) {
-        const preview = document.getElementById('previewImg');
-        if(url.trim() === "") {
-            preview.style.backgroundImage = "url('https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png')";
-        } else {
-            preview.style.backgroundImage = `url('${url}')`;
+    let checkTimer;
+
+    // وظيفة تحميل آخر ويب هوك محفوظ
+    function loadLastWebhook() {
+        const savedUrl = localStorage.getItem('lastWebhook');
+        if (savedUrl) {
+            document.getElementById('webhookUrl').value = savedUrl;
+            checkWebhook(savedUrl);
         }
     }
 
-    function toggleRoleInput() {
-        const type = document.getElementById('mentionType').value;
-        document.getElementById('idInputContainer').classList.toggle('hidden', type !== 'role');
+    function updateAvatarPreview(url) {
+        const preview = document.getElementById('avatarPreview');
+        preview.style.backgroundImage = url.trim() === "" ? "none" : `url('${url}')`;
+    }
+
+    async function checkWebhook(url) {
+        clearTimeout(checkTimer);
+        const dot = document.getElementById('statusDot');
+        const msg = document.getElementById('statusMessage');
+        const btn = document.getElementById('mainSendBtn');
+
+        // دعم روابط ديسكورد العادية والكناري
+        const isValidUrl = url.startsWith("https://discord.com/api/webhooks/") || 
+                           url.startsWith("https://canary.discord.com/api/webhooks/");
+
+        if (!isValidUrl) {
+            dot.style.background = "#444";
+            msg.innerText = "الرابط غير صالح!";
+            msg.style.color = "var(--accent-red)";
+            btn.disabled = true; btn.style.opacity = "0.5";
+            return;
+        }
+
+        msg.innerText = "جاري الفحص...";
+        msg.style.color = "var(--accent-yellow)";
+
+        checkTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(url);
+                if (res.ok) {
+                    const data = await res.json();
+                    dot.style.background = "var(--accent-green)";
+                    msg.innerText = `✅ شغال: ${data.name}`;
+                    msg.style.color = "var(--accent-green)";
+                    btn.disabled = false; btn.style.opacity = "1"; btn.style.cursor = "pointer";
+                    localStorage.setItem('lastWebhook', url); // حفظ الرابط
+                } else { throw new Error(); }
+            } catch (e) {
+                dot.style.background = "var(--accent-red)";
+                msg.innerText = "❌ الرابط معطل!";
+                msg.style.color = "var(--accent-red)";
+                btn.disabled = true; btn.style.opacity = "0.5";
+            }
+        }, 600);
     }
 
     async function createNewTask() {
@@ -182,68 +172,40 @@
         const delay = parseFloat(document.getElementById('delay').value) * 1000;
         const botName = document.getElementById('botName').value;
         const botAvatar = document.getElementById('botAvatar').value;
-        const mentionType = document.getElementById('mentionType').value;
-        const targetId = document.getElementById('targetId').value;
-
-        if (!url || !message) return alert("أدخل البيانات!");
 
         const taskId = `task-${Date.now()}`;
         const logEntry = document.createElement('div');
         logEntry.id = taskId;
         logEntry.className = 'log-entry';
         logEntry.dataset.running = "true";
-        logEntry.innerHTML = `
-            <div>
-                <b>عملية جديدة:</b> <span class="info">جاري الإرسال...</span>
-            </div>
-            <div class="controls-mini">
-                <button class="btn-mini stop-mini" onclick="stopTask('${taskId}')">إيقاف</button>
-                <button class="btn-mini delete-mini hidden" onclick="this.parentElement.parentElement.remove()">حذف</button>
-            </div>
-        `;
+        logEntry.innerHTML = `<div><span class="info">أرسل 0 من ${count}</span></div>
+                              <button onclick="stopTask('${taskId}')" style="background:var(--accent-red); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">إيقاف</button>`;
         document.getElementById('taskLogs').prepend(logEntry);
-
-        let mention = "";
-        if (mentionType === "everyone") mention = "@everyone ";
-        if (mentionType === "here") mention = "@here ";
-        if (mentionType === "role") mention = `<@&${targetId}> `;
 
         for (let i = 1; i <= count; i++) {
             if (logEntry.dataset.running === "false") break;
-            logEntry.querySelector('.info').innerText = `${i} من ${count}`;
+            logEntry.querySelector('.info').innerText = `أرسل ${i} من ${count}`;
 
             try {
                 const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        content: mention + message,
-                        username: botName || undefined,
-                        avatar_url: botAvatar || undefined
-                    })
+                    body: JSON.stringify({ content: message, username: botName || undefined, avatar_url: botAvatar || undefined })
                 });
-
                 if (res.status === 429) {
                     const data = await res.json();
-                    await new Promise(r => setTimeout(r, (data.retry_after * 1000) || 3000));
+                    await new Promise(r => setTimeout(r, data.retry_after * 1000));
                     i--; continue;
                 }
             } catch (e) { break; }
-
             if (i < count) await new Promise(r => setTimeout(r, delay));
         }
-
-        logEntry.querySelector('.info').innerText = "✅ اكتمل";
-        logEntry.querySelector('.stop-mini').classList.add('hidden');
-        logEntry.querySelector('.delete-mini').classList.remove('hidden');
+        logEntry.querySelector('.info').innerText = `✅ اكتملت العملية (${count})`;
     }
 
     function stopTask(id) {
-        const el = document.getElementById(id);
-        el.dataset.running = "false";
-        el.querySelector('.info').innerText = "🛑 توقف";
-        el.querySelector('.stop-mini').classList.add('hidden');
-        el.querySelector('.delete-mini').classList.remove('hidden');
+        document.getElementById(id).dataset.running = "false";
+        document.getElementById(id).querySelector('.info').innerText += " (متوقف)";
     }
 </script>
 
