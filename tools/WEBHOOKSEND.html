@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhooks Pro | All-In-One</title>
+    <title>Webhooks Pro | Final Edition</title>
     <style>
         :root {
             --bg-dark: #0d1117;
@@ -53,38 +53,54 @@
         .btn-send {
             background: var(--accent-green); color: white; border: none; padding: 15px; width: 100%; 
             font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; font-size: 1.1em;
-            transition: 0.3s;
         }
 
-        .status-msg { font-size: 0.75em; margin-top: 5px; display: block; }
-        .log-entry {
-            background: var(--panel-dark); padding: 12px; border-radius: 8px; margin-top: 10px;
-            border: 1px solid var(--border-color); border-right: 5px solid var(--accent-blue);
-            display: flex; justify-content: space-between; align-items: center;
+        .monitor-header {
+            width: 100%; max-width: 600px; display: flex; justify-content: space-between; 
+            align-items: center; margin-top: 25px; margin-bottom: 10px;
         }
+
+        .btn-clear-all {
+            background: transparent; color: var(--accent-red); border: 1px solid var(--accent-red);
+            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em;
+        }
+
+        .btn-clear-all:hover { background: var(--accent-red); color: white; }
+
+        .log-entry {
+            background: var(--panel-dark); padding: 12px; border-radius: 8px; margin-bottom: 10px;
+            border: 1px solid var(--border-color); border-right: 5px solid var(--accent-blue);
+            display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-mini { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; font-size: 0.8em; }
+        .stop-btn { background: var(--accent-yellow); }
+        .del-btn { background: #484f58; }
         .hidden { display: none; }
     </style>
 </head>
 <body onload="loadLastWebhook()">
 
 <div class="container">
-    <h2>🎭 مرسل الويب هوك الشامل</h2>
+    <h2>🎭 مرسل الويب هوك الاحترافي</h2>
     
-    <label>رابط الويب هوك (Discord / Canary)</label>
+    <label>رابط الويب هوك (عادي / كناري)</label>
     <div class="input-wrapper">
         <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." oninput="checkWebhook(this.value)">
         <div id="statusDot" class="status-dot"></div>
     </div>
-    <span id="statusMessage" class="status-msg" style="color: #8b949e;">يرجى إدخال الرابط...</span>
+    <span id="statusMessage" style="font-size: 0.75em; margin-top:5px; display:block; color: #8b949e;">يرجى إدخال الرابط...</span>
 
     <div class="row" style="margin-top: 10px;">
         <div style="flex: 1;">
             <label>اسم البوت</label>
-            <input type="text" id="botName" placeholder="Admin Bot">
+            <input type="text" id="botName" placeholder="Bot Name">
         </div>
         <div style="flex: 1.2;">
             <label>رابط الصورة</label>
-            <input type="text" id="botAvatar" placeholder=".png / .jpg" oninput="updateAvatarPreview(this.value)">
+            <input type="text" id="botAvatar" placeholder="URL" oninput="updateAvatarPreview(this.value)">
         </div>
         <div id="avatarPreview" class="avatar-preview"></div>
     </div>
@@ -122,17 +138,19 @@
     <button id="mainSendBtn" class="btn-send" onclick="createNewTask()" disabled style="opacity: 0.5; cursor: not-allowed;">بدء الإرسال 🚀</button>
 </div>
 
-<div id="taskLogs" style="width: 100%; max-width: 600px; margin-top: 20px;"></div>
+<div class="monitor-header">
+    <span>العمليات الجارية:</span>
+    <button class="btn-clear-all" onclick="clearFinished()">مسح الكل المنتهي 🗑️</button>
+</div>
+
+<div id="taskLogs" style="width: 100%; max-width: 600px;"></div>
 
 <script>
     let checkTimer;
 
     function loadLastWebhook() {
         const savedUrl = localStorage.getItem('lastWebhook');
-        if (savedUrl) {
-            document.getElementById('webhookUrl').value = savedUrl;
-            checkWebhook(savedUrl);
-        }
+        if (savedUrl) { document.getElementById('webhookUrl').value = savedUrl; checkWebhook(savedUrl); }
     }
 
     function toggleRoleInput() {
@@ -151,19 +169,14 @@
         const msg = document.getElementById('statusMessage');
         const btn = document.getElementById('mainSendBtn');
 
-        const isValidUrl = url.startsWith("https://discord.com/api/webhooks/") || 
-                           url.startsWith("https://canary.discord.com/api/webhooks/");
+        const isValid = url.startsWith("https://discord.com/api/webhooks/") || url.startsWith("https://canary.discord.com/api/webhooks/");
 
-        if (!isValidUrl) {
-            dot.style.background = "#444";
-            msg.innerText = "الرابط غير صالح!";
-            msg.style.color = "var(--accent-red)";
-            btn.disabled = true; btn.style.opacity = "0.5";
-            return;
+        if (!isValid) {
+            dot.style.background = "#444"; msg.innerText = "الرابط غير صالح!"; msg.style.color = "var(--accent-red)";
+            btn.disabled = true; btn.style.opacity = "0.5"; return;
         }
 
-        msg.innerText = "جاري الفحص...";
-        msg.style.color = "var(--accent-yellow)";
+        msg.innerText = "جاري الفحص..."; msg.style.color = "var(--accent-yellow)";
 
         checkTimer = setTimeout(async () => {
             try {
@@ -171,15 +184,12 @@
                 if (res.ok) {
                     const data = await res.json();
                     dot.style.background = "var(--accent-green)";
-                    msg.innerText = `✅ شغال: ${data.name}`;
-                    msg.style.color = "var(--accent-green)";
+                    msg.innerText = `✅ شغال: ${data.name}`; msg.style.color = "var(--accent-green)";
                     btn.disabled = false; btn.style.opacity = "1"; btn.style.cursor = "pointer";
                     localStorage.setItem('lastWebhook', url);
                 } else { throw new Error(); }
             } catch (e) {
-                dot.style.background = "var(--accent-red)";
-                msg.innerText = "❌ الرابط معطل!";
-                msg.style.color = "var(--accent-red)";
+                dot.style.background = "var(--accent-red)"; msg.innerText = "❌ الرابط معطل!"; msg.style.color = "var(--accent-red)";
                 btn.disabled = true; btn.style.opacity = "0.5";
             }
         }, 600);
@@ -199,9 +209,16 @@
         const logEntry = document.createElement('div');
         logEntry.id = taskId;
         logEntry.className = 'log-entry';
+        logEntry.dataset.finished = "false";
         logEntry.dataset.running = "true";
-        logEntry.innerHTML = `<div><span class="info">أرسل 0 من ${count}</span></div>
-                              <button onclick="stopTask('${taskId}')" style="background:var(--accent-red); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">إيقاف</button>`;
+        
+        logEntry.innerHTML = `
+            <div><span class="info-text">جاري البدء...</span></div>
+            <div class="actions">
+                <button class="btn-mini stop-btn" onclick="stopTask('${taskId}')">إيقاف</button>
+                <button class="btn-mini del-btn hidden" onclick="this.parentElement.parentElement.remove()">حذف</button>
+            </div>
+        `;
         document.getElementById('taskLogs').prepend(logEntry);
 
         let mention = "";
@@ -211,17 +228,13 @@
 
         for (let i = 1; i <= count; i++) {
             if (logEntry.dataset.running === "false") break;
-            logEntry.querySelector('.info').innerText = `أرسل ${i} من ${count}`;
+            logEntry.querySelector('.info-text').innerText = `إرسال ${i} من ${count}...`;
 
             try {
                 const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        content: mention + message, 
-                        username: botName || undefined, 
-                        avatar_url: botAvatar || undefined 
-                    })
+                    body: JSON.stringify({ content: mention + message, username: botName || undefined, avatar_url: botAvatar || undefined })
                 });
                 if (res.status === 429) {
                     const data = await res.json();
@@ -229,14 +242,27 @@
                     i--; continue;
                 }
             } catch (e) { break; }
-            if (i < count) await new Promise(r => setTimeout(r, delay));
+            if (i < count && logEntry.dataset.running === "true") await new Promise(r => setTimeout(r, delay));
         }
-        logEntry.querySelector('.info').innerText = `✅ اكتملت العملية (${count})`;
+
+        logEntry.dataset.finished = "true";
+        logEntry.querySelector('.info-text').innerText = `✅ اكتملت (${count})`;
+        logEntry.querySelector('.stop-btn').classList.add('hidden');
+        logEntry.querySelector('.del-btn').classList.remove('hidden');
     }
 
     function stopTask(id) {
-        document.getElementById(id).dataset.running = "false";
-        document.getElementById(id).querySelector('.info').innerText += " (متوقف)";
+        const el = document.getElementById(id);
+        el.dataset.running = "false";
+        el.dataset.finished = "true";
+        el.querySelector('.info-text').innerText = "🛑 متوقف";
+        el.querySelector('.stop-btn').classList.add('hidden');
+        el.querySelector('.del-btn').classList.remove('hidden');
+    }
+
+    function clearFinished() {
+        const finished = document.querySelectorAll('.log-entry[data-finished="true"]');
+        finished.forEach(el => el.remove());
     }
 </script>
 
