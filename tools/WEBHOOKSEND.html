@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webhooks Pro | Canary Support</title>
+    <title>Webhooks Pro | All-In-One</title>
     <style>
         :root {
             --bg-dark: #0d1117;
@@ -62,19 +62,20 @@
             border: 1px solid var(--border-color); border-right: 5px solid var(--accent-blue);
             display: flex; justify-content: space-between; align-items: center;
         }
+        .hidden { display: none; }
     </style>
 </head>
 <body onload="loadLastWebhook()">
 
 <div class="container">
-    <h2>🎭 WEBHOOKS FUCKER</h2>
+    <h2>🎭 مرسل الويب هوك الشامل</h2>
     
-    <label>رابط الويب هوك (عادي أو كناري)</label>
+    <label>رابط الويب هوك (Discord / Canary)</label>
     <div class="input-wrapper">
         <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." oninput="checkWebhook(this.value)">
         <div id="statusDot" class="status-dot"></div>
     </div>
-    <span id="statusMessage" class="status-msg" style="color: #8b949e;">يرجى التحقق من الرابط...</span>
+    <span id="statusMessage" class="status-msg" style="color: #8b949e;">يرجى إدخال الرابط...</span>
 
     <div class="row" style="margin-top: 10px;">
         <div style="flex: 1;">
@@ -82,10 +83,26 @@
             <input type="text" id="botName" placeholder="Admin Bot">
         </div>
         <div style="flex: 1.2;">
-            <label>رابط الصورة (Avatar)</label>
-            <input type="text" id="botAvatar" placeholder="رابط مباشر .png أو .jpg" oninput="updateAvatarPreview(this.value)">
+            <label>رابط الصورة</label>
+            <input type="text" id="botAvatar" placeholder=".png / .jpg" oninput="updateAvatarPreview(this.value)">
         </div>
         <div id="avatarPreview" class="avatar-preview"></div>
+    </div>
+
+    <div class="row">
+        <div style="flex: 1.5;">
+            <label>نوع المنشن</label>
+            <select id="mentionType" onchange="toggleRoleInput()">
+                <option value="none">بدون</option>
+                <option value="everyone">@everyone</option>
+                <option value="here">@here</option>
+                <option value="role">رتبة (ID)</option>
+            </select>
+        </div>
+        <div id="idInputContainer" style="flex: 1;" class="hidden">
+            <label>الـ ID</label>
+            <input type="text" id="targetId" placeholder="123456...">
+        </div>
     </div>
 
     <div class="row">
@@ -110,13 +127,17 @@
 <script>
     let checkTimer;
 
-    // وظيفة تحميل آخر ويب هوك محفوظ
     function loadLastWebhook() {
         const savedUrl = localStorage.getItem('lastWebhook');
         if (savedUrl) {
             document.getElementById('webhookUrl').value = savedUrl;
             checkWebhook(savedUrl);
         }
+    }
+
+    function toggleRoleInput() {
+        const type = document.getElementById('mentionType').value;
+        document.getElementById('idInputContainer').classList.toggle('hidden', type !== 'role');
     }
 
     function updateAvatarPreview(url) {
@@ -130,7 +151,6 @@
         const msg = document.getElementById('statusMessage');
         const btn = document.getElementById('mainSendBtn');
 
-        // دعم روابط ديسكورد العادية والكناري
         const isValidUrl = url.startsWith("https://discord.com/api/webhooks/") || 
                            url.startsWith("https://canary.discord.com/api/webhooks/");
 
@@ -154,7 +174,7 @@
                     msg.innerText = `✅ شغال: ${data.name}`;
                     msg.style.color = "var(--accent-green)";
                     btn.disabled = false; btn.style.opacity = "1"; btn.style.cursor = "pointer";
-                    localStorage.setItem('lastWebhook', url); // حفظ الرابط
+                    localStorage.setItem('lastWebhook', url);
                 } else { throw new Error(); }
             } catch (e) {
                 dot.style.background = "var(--accent-red)";
@@ -172,6 +192,8 @@
         const delay = parseFloat(document.getElementById('delay').value) * 1000;
         const botName = document.getElementById('botName').value;
         const botAvatar = document.getElementById('botAvatar').value;
+        const mentionType = document.getElementById('mentionType').value;
+        const targetId = document.getElementById('targetId').value;
 
         const taskId = `task-${Date.now()}`;
         const logEntry = document.createElement('div');
@@ -182,6 +204,11 @@
                               <button onclick="stopTask('${taskId}')" style="background:var(--accent-red); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">إيقاف</button>`;
         document.getElementById('taskLogs').prepend(logEntry);
 
+        let mention = "";
+        if (mentionType === "everyone") mention = "@everyone ";
+        if (mentionType === "here") mention = "@here ";
+        if (mentionType === "role") mention = `<@&${targetId}> `;
+
         for (let i = 1; i <= count; i++) {
             if (logEntry.dataset.running === "false") break;
             logEntry.querySelector('.info').innerText = `أرسل ${i} من ${count}`;
@@ -190,11 +217,15 @@
                 const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: message, username: botName || undefined, avatar_url: botAvatar || undefined })
+                    body: JSON.stringify({ 
+                        content: mention + message, 
+                        username: botName || undefined, 
+                        avatar_url: botAvatar || undefined 
+                    })
                 });
                 if (res.status === 429) {
                     const data = await res.json();
-                    await new Promise(r => setTimeout(r, data.retry_after * 1000));
+                    await new Promise(r => setTimeout(r, (data.retry_after * 1000) || 2000));
                     i--; continue;
                 }
             } catch (e) { break; }
