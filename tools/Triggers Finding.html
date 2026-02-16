@@ -2,198 +2,267 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Triggers Finding - AL3MFALEH Ultimate</title>
+    <title>AL3MFALEH - Clean Triggers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background: #0a0a0b; color: #a9b1d6; display: flex; gap: 20px; margin: 0; }
-    .sidebar { width: 260px; background: #16161e; padding: 20px; border-radius: 0 12px 12px 0; border-left: 1px solid #24283b; height: 100vh; position: sticky; top: 0; box-sizing: border-box; overflow-y: auto; }
-    .sidebar h3 { font-size: 16px; color: #7aa2f7; margin-bottom: 15px; border-bottom: 1px solid #24283b; padding-bottom: 10px; }
-    .saved-item { display: flex; justify-content: space-between; align-items: center; background: #1a1b26; padding: 10px; margin-bottom: 8px; border-radius: 6px; font-size: 13px; cursor: pointer; border: 1px solid transparent; color: #a9b1d6; }
-    .saved-item:hover { border-color: #7aa2f7; }
-    .main-content { flex-grow: 1; padding: 20px; max-width: 1000px; margin: auto; }
-    .header-area { text-align: center; margin-bottom: 20px; }
-    .header-area h2 { color: #7aa2f7; margin: 0; }
-    .rights-text { font-size: 12px; color: #565f89; letter-spacing: 2px; margin-top: 5px; font-weight: bold; }
-    .management-box { background: #16161e; padding: 20px; border-radius: 12px; border: 1px solid #24283b; margin-bottom: 20px; }
-    .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; min-height: 30px; }
-    .tag { background: #7aa2f7; color: #0a0a0b; padding: 6px 14px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
-    input { padding: 12px; border-radius: 6px; border: 1px solid #24283b; background: #1a1b26; color: #fff; text-align: right; outline: none; width: 100%; box-sizing: border-box; }
-    input:focus { border-color: #7aa2f7; }
-    textarea { width: 100%; height: 400px; padding: 15px; border-radius: 8px; border: 1px solid #24283b; background: #0a0a0b; color: #9ece6a; font-family: 'Consolas', monospace; direction: ltr; text-align: left; white-space: pre; box-sizing: border-box; font-size: 14px; }
-    .btn-main { background-color: #7aa2f7; color: #0a0a0b; width: 100%; margin-bottom: 15px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; padding: 15px; border-radius: 8px; }
-    .buttons-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-    .buttons-row button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; min-width: 120px; }
-    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-    .modal-content { background-color: #16161e; margin: 15% auto; padding: 25px; border: 1px solid #7aa2f7; width: 400px; border-radius: 12px; text-align: center; color: white; }
-    .server-input { flex: 2 !important; }
-</style>
+        :root { --bg-color: #08080c; --sidebar-bg: #0f0f17; --accent-cyan: #12e5d1; --accent-purple: #4a10d1; --accent-red: #ff4c4c; --accent-pink: #e91e63; --accent-blue: #2196f3; --text-color: #a9b1d6; --border-color: #1b1b2b; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        .sidebar { width: 320px; background: var(--sidebar-bg); padding: 20px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .sidebar-title { color: #7aa2f7; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .sidebar-section { background: #16161e; border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); }
+        .lib-header { font-size: 11px; margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .lib-item { background: #0d0d14; border: 1px solid var(--border-color); padding: 8px; border-radius: 5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 11px; }
+
+        .sidebar-add-zone { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
+        .side-input { background: #0d0d14; border: 1px solid #24283b; border-radius: 6px; padding: 10px; color: white; outline: none; text-align: right; font-size: 12px; }
+        .side-btn { border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; }
+
+        .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; position: relative; }
+        .header-title { text-align: center; }
+        .header-title h1 { color: #7aa2f7; margin: 0; font-size: 26px; }
+        .header-title p { color: #565f89; font-size: 11px; letter-spacing: 3px; }
+
+        .search-section { width: 100%; max-width: 950px; background: #11111b; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .tags-area { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 25px; flex-direction: row-reverse; }
+        .tag-red { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(255, 76, 76, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); display: flex; align-items: center; gap: 8px; }
+        .tag-blue { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(122, 162, 247, 0.15); color: #7aa2f7; border: 1px solid #7aa2f7; display: flex; align-items: center; gap: 8px; }
+
+        .main-input { width: 100%; background: #0d0d14; border: 1px solid var(--accent-cyan); border-radius: 6px; padding: 12px; color: white; outline: none; text-align: right; box-sizing: border-box; }
+        .btn-upload-main { width: 100%; max-width: 950px; background: rgba(18, 229, 209, 0.05); color: var(--accent-cyan); border: 1px dashed var(--accent-cyan); padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        .tabs-container { display: flex; gap: 10px; width: 100%; max-width: 950px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #16161e; color: #565f89; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: rgba(122, 162, 247, 0.1); color: #7aa2f7; border: 1px solid #7aa2f7; }
+
+        .display-area { width: 100%; max-width: 950px; flex: 1; background: #050507; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 100px; }
+        textarea { width: 100%; height: 100%; background: transparent; color: #9ece6a; border: none; padding: 15px; font-family: 'Consolas', monospace; font-size: 13px; resize: none; outline: none; display: none; box-sizing: border-box; line-height: 1.6; }
+        textarea.active { display: block; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0f; padding: 15px 0; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .actions-row { display: flex; align-items: center; gap: 10px; width: 95%; max-width: 950px; flex-direction: row-reverse; }
+        .bottom-input { flex: 1; background: #16161e; border: 1px solid #24283b; border-radius: 6px; padding: 12px; color: white; text-align: right; outline: none; }
+        .btn-bottom { padding: 10px 20px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .btn-discord-file { background: var(--accent-pink); }
+        .btn-webhook { background: var(--accent-blue); }
+        .copyright { color: #565f89; font-size: 11px; }
+    </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h3>💾 الحوافظ الدائمة</h3>
-        <div id="savedList"></div>
+        <div class="sidebar-title"><i class="fas fa-database"></i> الحوافظ الدائمة</div>
+        <div class="sidebar-section">
+            <div class="lib-header" style="color: var(--accent-purple);">قائمة البحث المحفوظة</div>
+            <div id="libSearch"></div>
+        </div>
+        <div class="sidebar-section">
+            <div class="lib-header" style="color: var(--accent-red);">قائمة الحصر المحفوظة</div>
+            <div id="libFilter"></div>
+        </div>
+        <div class="sidebar-add-zone">
+            <input type="text" id="tagInput" class="side-input" placeholder="...أدخل الكلمة هنا">
+            <div style="display: flex; gap: 5px;">
+                <button class="side-btn" style="flex:1; background: var(--accent-purple); color: white;" onclick="addToLib('search')">حفظ دائم</button>
+                <button class="side-btn" style="flex:1; background: var(--accent-red); color: white;" onclick="addToLib('filter')">إضافة حصر</button>
+            </div>
+        </div>
     </div>
 
     <div class="main-content">
-        <div class="header-area">
-            <h2>Triggers Finding</h2>
-            <div class="rights-text">POWERED BY AL3MFALEH</div>
+        <div class="header-title">
+            <h1>Triggers Finding</h1>
+            <p>POWERED BY AL3MFALEH</p>
+        </div>
+        <div class="search-section">
+            <div id="activeTags" class="tags-area"></div>
+            <input type="text" id="liveSearch" class="main-input" placeholder="...بحث يدوي مباشر داخل الأكواد" oninput="applyFilters()">
+        </div>
+        <button class="btn-upload-main" onclick="document.getElementById('folderInput').click()">
+            <i class="fas fa-folder-open"></i> إضغط هنا لرفع مجلد السكربتات والبدء بالفحص
+        </button>
+        <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="processFiles(this.files)">
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="showTab('all', this)">تريجرات (<span id="c-all">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('saved', this)">مستخرج (<span id="c-saved">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('coords', this)">إحداثيات (<span id="c-coords">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('hooks', this)">ويبهوك (<span id="c-hooks">0</span>)</button>
         </div>
 
-        <div class="management-box">
-            <div id="tagsContainer" class="tags-container"></div>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <input type="text" id="newWordInput" placeholder="أضف كلمة للفلتر الحصر...">
-                <button style="background: #03dac6; color: black; width: 100px; cursor:pointer; border:none; border-radius:6px;" onclick="addNewTag()">إضافة</button>
-                <button style="background: #3700b3; color: white; width: 120px; cursor:pointer; border:none; border-radius:6px;" onclick="saveToSidebar()">حفظ دائم</button>
+        <div class="display-area">
+            <textarea id="txt-all" class="active" readonly></textarea>
+            <textarea id="txt-saved" readonly></textarea>
+            <textarea id="txt-coords" readonly></textarea>
+            <textarea id="txt-hooks" readonly></textarea>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="actions-row">
+                <input type="text" id="serverName" class="bottom-input" placeholder="...اكتب اسم السيرفر هنا">
+                <button class="btn-bottom btn-webhook" onclick="setWebhook()">الويب هوك <i class="fas fa-cog"></i></button>
+                <button class="btn-bottom btn-discord-file" onclick="sendFileToDiscord()">إرسال ملف <i class="fas fa-file-export"></i></button>
             </div>
-            <input type="text" id="manualSearch" style="border: 2px solid #03dac6;" placeholder="🔍 بحث يدوي مباشر داخل الأكواد..." onkeyup="filterResults()">
-            <div style="margin-top: 10px; font-size: 13px; color: #03dac6;">
-                <input type="checkbox" id="filterActive" onchange="filterResults()" checked>
-                <label for="filterActive">تفعيل نظام الحصر (Tags)</label>
-            </div>
-        </div>
-
-        <button class="btn-main" onclick="document.getElementById('folderInput').click()">📁 اختيار المجلد وفحصه الآن</button>
-        <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="processFolder(this.files)">
-
-        <div id="fileStatus" style="color: #bb86fc; font-size: 14px; margin-bottom: 10px;">جاهز...</div>
-        <textarea id="resultArea" readonly></textarea>
-
-        <div class="buttons-row">
-            <input type="text" id="serverNameMain" class="server-input" placeholder="اكتب اسم السيرفر هنا..." oninput="localStorage.setItem('al3_server', this.value)">
-            <button style="background: #2196F3; color: white;" onclick="openWebhookModal()">⚙️ الويب هوك</button>
-            <button style="background: #e91e63; color: white;" onclick="sendToWebhookAsFile()">📁 إرسال ملف للديسكورد</button>
-            <button style="background: #4caf50; color: white; display: none;" id="downloadBtn" onclick="downloadTxt()">💾 تحميل TXT</button>
-            <button style="background: #ffc107; color: black;" onclick="enableEditing()">✏️ تعديل</button>
-        </div>
-
-        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #565f89;">جميع الحقوق محفوظة &copy; 2026 | <b>AL3MFALEH</b></div>
-    </div>
-
-    <div id="webhookModal" class="modal">
-        <div class="modal-content">
-            <h3 style="color: #03dac6;">رابط الويب هوك</h3>
-            <input type="text" id="webhookUrlInput" placeholder="رابط الويب هوك...">
-            <button style="background: #03dac6; margin-top:20px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;" onclick="saveWebhook()">حفظ</button>
-            <button style="background: #333; color:white; margin-top:20px; padding:10px 20px; border:none; border-radius:6px; cursor:pointer;" onclick="closeWebhookModal()">إغلاق</button>
+            <div class="copyright">جميع الحقوق محفوظة © 2026 | AL3MFALEH</div>
         </div>
     </div>
 
 <script>
-    let originalData = []; 
-    let filterWords = [];
-    let savedKeywords = JSON.parse(localStorage.getItem('al3_keys')) || ['TargetId', 'playerId', 'Citizenid'];
-    
-    // الرابط الافتراضي الذي زودتني به
-    const defaultWebhook = "https://discord.com/api/webhooks/1457952736946552883/77J_mPUC3h77luu0X1SQZd4jkDHrzjwhlv3YgqlZyiOk3uyTDnkYV7f8Sx7-zQfFt2UI";
+    let rawData = { all: [], coords: [], hooks: [] };
+    let currentTab = 'all';
+    let lib = { search: JSON.parse(localStorage.getItem('L_S_V10') || '[]'), filter: JSON.parse(localStorage.getItem('L_F_V10') || '[]') };
+    let activeTags = { search: [], filter: [] };
 
-    // التحقق من وجود ويب هوك مخزن مسبقاً، وإلا استخدام الافتراضي
-    if (!localStorage.getItem('al3_webhook')) {
-        localStorage.setItem('al3_webhook', defaultWebhook);
+    window.onload = renderLibs;
+
+    function setWebhook() {
+        let current = localStorage.getItem('SAVED_WEBHOOK_URL') || "";
+        let url = prompt("أدخل رابط الويب هوك:", current);
+        if (url !== null) {
+            if (url.includes("discord.com/api/webhooks")) {
+                localStorage.setItem('SAVED_WEBHOOK_URL', url);
+                alert("✅ تم الحفظ.");
+            } else { alert("❌ رابط غير صالح."); }
+        }
     }
 
-    document.getElementById('serverNameMain').value = localStorage.getItem('al3_server') || '';
-
-    function openWebhookModal() {
-        document.getElementById('webhookUrlInput').value = localStorage.getItem('al3_webhook') || '';
-        document.getElementById('webhookModal').style.display = "block";
-    }
-    function closeWebhookModal() { document.getElementById('webhookModal').style.display = "none"; }
-    function saveWebhook() { localStorage.setItem('al3_webhook', document.getElementById('webhookUrlInput').value.trim()); closeWebhookModal(); }
-
-    function addNewTag() {
-        const word = document.getElementById('newWordInput').value.trim().toLowerCase();
-        if (word && !filterWords.includes(word)) { filterWords.push(word); document.getElementById('newWordInput').value = ''; updateTagsUI(); }
-    }
-    function removeTag(index) { filterWords.splice(index, 1); updateTagsUI(); }
-    function updateTagsUI() {
-        const container = document.getElementById('tagsContainer'); container.innerHTML = '';
-        filterWords.forEach((word, index) => { container.innerHTML += `<div class="tag">${word} <span style="cursor:pointer;margin-right:5px" onclick="removeTag(${index})">×</span></div>`; });
-        filterResults();
+    async function sendFileToDiscord() {
+        let url = localStorage.getItem('SAVED_WEBHOOK_URL');
+        if (!url) return setWebhook();
+        const server = document.getElementById('serverName').value || "غير محدد";
+        const content = document.getElementById(`txt-${currentTab}`).value;
+        if(!content) return alert("لا توجد نتائج!");
+        const fileContent = `التقرير: ${currentTab.toUpperCase()}\nالسيرفر: ${server}\n\n${content}`;
+        const blob = new Blob([fileContent], { type: 'text/plain' });
+        const formData = new FormData();
+        formData.append('file', blob, `Report_${server}.txt`);
+        try {
+            await fetch(url, { method: 'POST', body: formData });
+            alert("✅ تم إرسال الملف بنجاح!");
+        } catch(e) { alert("❌ خطأ في الإرسال."); }
     }
 
-    async function processFolder(files) {
-        originalData = []; let fileCount = 0;
-        document.getElementById('resultArea').value = "جاري الفحص...";
-        for (let file of files) {
-            if ((file.name.endsWith('.lua') || file.name.endsWith('.js')) && file.size < 1000000) {
-                fileCount++; const content = await file.text();
-                let index = content.indexOf("TriggerServerEvent");
-                while (index !== -1) {
-                    let bc = 0, st = false, ft = "";
-                    for (let i = index; i < content.length; i++) {
-                        ft += content[i]; if (content[i] === '(') { bc++; st = true; } else if (content[i] === ')') bc--;
-                        if (st && bc === 0) { originalData.push({ path: file.webkitRelativePath, code: ft.trim() }); break; }
-                        if (ft.length > 500) break;
-                    }
-                    index = content.indexOf("TriggerServerEvent", index + 1);
+    function extractTriggersSmart(fullText, path) {
+        const triggers = [];
+        const pattern = /(TriggerServerEvent|TriggerClientEvent)\s*\(/g;
+        let match;
+        while ((match = pattern.exec(fullText)) !== null) {
+            let startIdx = match.index;
+            let bracketCount = 0, result = "", foundStart = false;
+            for (let i = startIdx; i < fullText.length; i++) {
+                let char = fullText[i];
+                result += char;
+                if (char === '(') { bracketCount++; foundStart = true; }
+                else if (char === ')') { bracketCount--; }
+                if (foundStart && bracketCount === 0) {
+                    let cleanedText = result.replace(/\s+/g, ' ').trim();
+                    triggers.push({ text: cleanedText, path: path });
+                    break;
                 }
+                if (i - startIdx > 2000) break; 
             }
         }
-        filterResults();
-        document.getElementById('fileStatus').innerText = `وجدنا: ${originalData.length} ترقر في ${fileCount} ملفات`;
-        document.getElementById('downloadBtn').style.display = 'inline-block';
+        return triggers;
     }
 
-    function filterResults() {
-        const manual = document.getElementById('manualSearch').value.toLowerCase();
-        const active = document.getElementById('filterActive').checked;
-        const filtered = originalData.filter(item => {
-            const c = item.code.toLowerCase();
-            const passTags = active && filterWords.length > 0 ? filterWords.some(w => c.includes(w)) : true;
-            return passTags && c.includes(manual);
-        });
-        document.getElementById('resultArea').value = `--- تقرير AL3MFALEH ---\nالسيرفر: ${localStorage.getItem('al3_server')}\n\n` + filtered.map(item => `[FILE: ${item.path}]\nCODE: ${item.code}\n-------------------`).join('\n');
-    }
-
-    async function sendToWebhookAsFile() {
-        const url = localStorage.getItem('al3_webhook');
-        const server = localStorage.getItem('al3_server') || "غير_محدد";
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('en-GB'); 
-        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-        if (!url) return alert("يرجى إعداد الرابط!");
-        if (originalData.length === 0 && document.getElementById('resultArea').value === "") return alert("لا توجد نتائج!");
-
-        const blob = new Blob([document.getElementById('resultArea').value], { type: 'text/plain' });
-        const formData = new FormData();
-        formData.append('file', new File([blob], `Report_${server}.txt`));
+    async function processFiles(files) {
+        rawData = { all: [], coords: [], hooks: [] };
+        let uniqueHooks = new Set(); // لضمان عدم تكرار الويبهوكات
         
-        const messageContent = `📂 **تقرير جديد من:** \`${server}\`\n📅 **التاريخ:** \`${dateStr}\`\n⏰ **الوقت:** \`${timeStr}\`\n👤 **بواسطة:** AL3MFALEH`;
+        for (const file of files) {
+            if (file.name.endsWith('.lua') || file.name.endsWith('.js')) {
+                const text = await file.text();
+                const path = file.webkitRelativePath;
 
-        formData.append('payload_json', JSON.stringify({ 
-            content: messageContent, 
-            username: "AL3MFALEH Scanner" 
-        }));
+                // استخراج التريجرات
+                rawData.all.push(...extractTriggersSmart(text, path));
 
-        try {
-            const res = await fetch(url, { method: 'POST', body: formData });
-            if (res.ok) alert("تم إرسال الملف والتقرير بنجاح!");
-            else alert("حدث خطأ في الإرسال. تأكد من صحة رابط الويب هوك.");
-        } catch (e) { alert("فشل الاتصال بالويب هوك."); }
+                // استخراج الويبهوكات (تصفية التكرار هنا)
+                const hooksFound = text.match(/https:\/\/discord\.com\/api\/webhooks\/[0-9]+\/[A-Za-z0-9._-]+/g);
+                if (hooksFound) {
+                    hooksFound.forEach(h => {
+                        if (!uniqueHooks.has(h)) {
+                            uniqueHooks.add(h);
+                            rawData.hooks.push({ text: h, path: path });
+                        }
+                    });
+                }
+
+                // استخراج الإحداثيات
+                const lines = text.split('\n');
+                lines.forEach(line => {
+                    const t = line.trim();
+                    if (t.match(/vector[34]\s*\(/)) rawData.coords.push({ text: t, path: path });
+                });
+            }
+        }
+        applyFilters();
+        alert("تم الفحص بنجاح!");
     }
 
-    function updateSidebarUI() {
-        const container = document.getElementById('savedList'); container.innerHTML = '';
-        savedKeywords.forEach((word, index) => {
-            container.innerHTML += `<div class="saved-item"><div style="flex-grow:1" onclick="if(!filterWords.includes('${word.toLowerCase()}')){filterWords.push('${word.toLowerCase()}');updateTagsUI()}">${word}</div> <span onclick="removeFromSidebar(${index})" style="color:#ff4d4d">×</span></div>`;
+    // دوال الفلترة المساعدة (بقيت كما هي)
+    function addToLib(type) {
+        const val = document.getElementById('tagInput').value.trim();
+        if (val && !lib[type].includes(val)) {
+            lib[type].push(val);
+            localStorage.setItem('L_' + (type==='search'?'S_V10':'F_V10'), JSON.stringify(lib[type]));
+            document.getElementById('tagInput').value = '';
+            renderLibs();
+        }
+    }
+    function activateTag(type, val) {
+        if (!activeTags[type].includes(val)) {
+            activeTags[type].push(val);
+            renderActiveTags();
+            applyFilters();
+        }
+    }
+    function renderLibs() {
+        ['search', 'filter'].forEach(t => {
+            document.getElementById(t === 'search' ? 'libSearch' : 'libFilter').innerHTML = lib[t].map(w => `
+                <div class="lib-item" onclick="activateTag('${t}', '${w}')">
+                    <i class="fas fa-times" style="color:#ff4c4c" onclick="event.stopPropagation(); deleteFromLib('${w}', '${t}')"></i>
+                    <span>${w}</span>
+                </div>
+            `).join('');
         });
-        localStorage.setItem('al3_keys', JSON.stringify(savedKeywords));
     }
-    function saveToSidebar() {
-        const val = document.getElementById('newWordInput').value.trim();
-        if (val && !savedKeywords.includes(val)) { savedKeywords.push(val); updateSidebarUI(); }
+    function deleteFromLib(word, type) {
+        lib[type] = lib[type].filter(x => x !== word);
+        localStorage.setItem('L_' + (type==='search'?'S_V10':'F_V10'), JSON.stringify(lib[type]));
+        renderLibs();
     }
-    function removeFromSidebar(index) { savedKeywords.splice(index, 1); updateSidebarUI(); }
-    function enableEditing() { document.getElementById('resultArea').readOnly = false; document.getElementById('resultArea').focus(); alert("الآن يمكنك التعديل داخل صندوق النتائج."); }
-    function downloadTxt() {
-        const a = document.createElement('a'); a.download = 'AL3MFALEH_Report.txt';
-        a.href = URL.createObjectURL(new Blob([document.getElementById('resultArea').value], {type:'text/plain'}));
-        a.click();
+    function renderActiveTags() {
+        let h = '';
+        activeTags.search.forEach(v => h += `<div class="tag-blue">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'search')"></i></div>`);
+        activeTags.filter.forEach(v => h += `<div class="tag-red">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'filter')"></i></div>`);
+        document.getElementById('activeTags').innerHTML = h;
     }
-    updateSidebarUI();
+    function removeActiveTag(v, type) {
+        activeTags[type] = activeTags[type].filter(x => x !== v);
+        renderActiveTags();
+        applyFilters();
+    }
+    function applyFilters() {
+        const query = document.getElementById('liveSearch').value.toLowerCase();
+        const fAll = rawData.all.filter(i => !activeTags.filter.some(t => i.text.toLowerCase().includes(t.toLowerCase())) && i.text.toLowerCase().includes(query));
+        const fSaved = [...rawData.all, ...rawData.coords].filter(i => activeTags.search.some(t => i.text.toLowerCase().includes(t.toLowerCase())) && i.text.toLowerCase().includes(query));
+        updateArea('all', fAll);
+        updateArea('saved', fSaved);
+        updateArea('coords', rawData.coords.filter(i => i.text.toLowerCase().includes(query)));
+        updateArea('hooks', rawData.hooks.filter(i => i.text.toLowerCase().includes(query)));
+    }
+    function updateArea(id, data) {
+        document.getElementById(`txt-${id}`).value = data.map(i => `${i.text}\n-- [${i.path}]\n---`).join('\n');
+        document.getElementById(`c-${id}`).innerText = data.length;
+    }
+    function showTab(type, btn) {
+        currentTab = type;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('textarea').forEach(t => t.classList.remove('active'));
+        document.getElementById(`txt-${type}`).classList.add('active');
+    }
 </script>
 </body>
 </html>
