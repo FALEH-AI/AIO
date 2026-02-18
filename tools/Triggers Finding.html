@@ -2,151 +2,194 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>AL3MFALEH - Clean Triggers</title>
+    <title>AL3MFALEH Finder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg-color: #08080c; --sidebar-bg: #0f0f17; --accent-cyan: #12e5d1; --accent-purple: #4a10d1; --accent-red: #ff4c4c; --accent-pink: #e91e63; --accent-blue: #2196f3; --text-color: #a9b1d6; --border-color: #1b1b2b; }
+        :root { --bg-color: #08080c; --sidebar-bg: #0f0f17; --accent-cyan: #12e5d1; --accent-purple: #4a10d1; --accent-red: #ff4c4c; --accent-pink: #e91e63; --accent-blue: #2196f3; --accent-gold: #e0af68; --text-color: #a9b1d6; --border-color: #1b1b2b; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* Sidebar */
         .sidebar { width: 320px; background: var(--sidebar-bg); padding: 20px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
         .sidebar-title { color: #7aa2f7; text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .sidebar-section { background: #16161e; border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); }
-        .lib-header { font-size: 11px; margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        .lib-item { background: #0d0d14; border: 1px solid var(--border-color); padding: 8px; border-radius: 5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 11px; }
+        .lib-header { font-size: 11px; color: var(--accent-cyan); margin-bottom: 8px; font-weight: bold; }
+        .lib-item { background: #0d0d14; border: 1px solid var(--border-color); padding: 8px; border-radius: 5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .lib-item:hover { border-color: var(--accent-cyan); background: #1a1b26; }
+        .side-input { width: 100%; background: #0d0d14; border: 1px solid #24283b; border-radius: 6px; padding: 10px; color: white; outline: none; text-align: right; font-size: 12px; box-sizing: border-box; }
+        .side-btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; margin-top: 5px; width: 100%; color: white; transition: 0.3s; }
+        .side-btn:active { transform: scale(0.95); }
 
-        .sidebar-add-zone { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
-        .side-input { background: #0d0d14; border: 1px solid #24283b; border-radius: 6px; padding: 10px; color: white; outline: none; text-align: right; font-size: 12px; }
-        .side-btn { border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; }
-
+        /* Main Content */
         .main-content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; position: relative; }
         .header-title { text-align: center; }
-        .header-title h1 { color: #7aa2f7; margin: 0; font-size: 26px; }
-        .header-title p { color: #565f89; font-size: 11px; letter-spacing: 3px; }
-
-        .search-section { width: 100%; max-width: 950px; background: #11111b; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .header-title h1 { color: #7aa2f7; margin: 0; font-size: 28px; text-shadow: 0 0 10px rgba(122, 162, 247, 0.3); }
+        .by-name { color: var(--accent-cyan); font-size: 12px; letter-spacing: 3px; font-weight: bold; margin-top: 5px; }
+        
+        .search-section { width: 100%; max-width: 1000px; background: #11111b; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .tags-area { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 25px; flex-direction: row-reverse; }
-        .tag-red { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(255, 76, 76, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); display: flex; align-items: center; gap: 8px; }
-        .tag-blue { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(122, 162, 247, 0.15); color: #7aa2f7; border: 1px solid #7aa2f7; display: flex; align-items: center; gap: 8px; }
+        .tag-active { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(18, 229, 209, 0.1); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); display: flex; align-items: center; gap: 8px; }
+        .tag-filter { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(255, 76, 76, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); display: flex; align-items: center; gap: 8px; }
+        
+        .main-input { width: 100%; background: #0d0d14; border: 1px solid var(--accent-cyan); border-radius: 6px; padding: 12px; color: white; outline: none; text-align: right; box-sizing: border-box; font-size: 14px; }
+        .btn-upload-main { width: 100%; max-width: 1000px; background: rgba(18, 229, 209, 0.05); color: var(--accent-cyan); border: 1px dashed var(--accent-cyan); padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-upload-main:hover { background: rgba(18, 229, 209, 0.1); }
 
-        .main-input { width: 100%; background: #0d0d14; border: 1px solid var(--accent-cyan); border-radius: 6px; padding: 12px; color: white; outline: none; text-align: right; box-sizing: border-box; }
-        .btn-upload-main { width: 100%; max-width: 950px; background: rgba(18, 229, 209, 0.05); color: var(--accent-cyan); border: 1px dashed var(--accent-cyan); padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* Tabs */
+        .tabs-container { display: flex; gap: 5px; width: 100%; max-width: 1000px; flex-wrap: wrap; }
+        .tab-btn { flex: 1; min-width: 110px; padding: 10px; border: none; border-radius: 8px; background: #16161e; color: #565f89; cursor: pointer; font-weight: bold; font-size: 10px; transition: 0.3s; border: 1px solid transparent; }
+        .tab-btn.active { background: rgba(122, 162, 247, 0.1); color: #7aa2f7; border-color: #7aa2f7; }
 
-        .tabs-container { display: flex; gap: 10px; width: 100%; max-width: 950px; }
-        .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #16161e; color: #565f89; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { background: rgba(122, 162, 247, 0.1); color: #7aa2f7; border: 1px solid #7aa2f7; }
-
-        .display-area { width: 100%; max-width: 950px; flex: 1; background: #050507; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 100px; }
+        /* Display Area */
+        .display-area { width: 100%; max-width: 1000px; flex: 1; background: #050507; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 110px; position: relative; }
         textarea { width: 100%; height: 100%; background: transparent; color: #9ece6a; border: none; padding: 15px; font-family: 'Consolas', monospace; font-size: 13px; resize: none; outline: none; display: none; box-sizing: border-box; line-height: 1.6; }
         textarea.active { display: block; }
-
-        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0f; padding: 15px 0; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .actions-row { display: flex; align-items: center; gap: 10px; width: 95%; max-width: 950px; flex-direction: row-reverse; }
-        .bottom-input { flex: 1; background: #16161e; border: 1px solid #24283b; border-radius: 6px; padding: 12px; color: white; text-align: right; outline: none; }
-        .btn-bottom { padding: 10px 20px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
-        .btn-discord-file { background: var(--accent-pink); }
-        .btn-webhook { background: var(--accent-blue); }
-        .copyright { color: #565f89; font-size: 11px; }
+        
+        /* Bottom Bar */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0f; padding: 15px 0; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 100; }
+        .actions-row { display: flex; align-items: center; gap: 10px; width: 95%; max-width: 1000px; flex-direction: row-reverse; }
+        .btn-action { padding: 12px 20px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-action:hover { opacity: 0.8; }
+        .copy-tag { font-size: 10px; color: #565f89; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-title"><i class="fas fa-database"></i> الحوافظ الدائمة</div>
+        <div class="sidebar-title"><i class="fas fa-fingerprint"></i> حوافظ AL3MFALEH</div>
+        
         <div class="sidebar-section">
-            <div class="lib-header" style="color: var(--accent-purple);">قائمة البحث المحفوظة</div>
+            <div class="lib-header">كلمات البحث المحفوظة</div>
             <div id="libSearch"></div>
         </div>
+
         <div class="sidebar-section">
-            <div class="lib-header" style="color: var(--accent-red);">قائمة الحصر المحفوظة</div>
+            <div class="lib-header" style="color:var(--accent-red)">كلمات الحصر (إخفاء تلقائي)</div>
             <div id="libFilter"></div>
         </div>
+
         <div class="sidebar-add-zone">
-            <input type="text" id="tagInput" class="side-input" placeholder="...أدخل الكلمة هنا">
-            <div style="display: flex; gap: 5px;">
-                <button class="side-btn" style="flex:1; background: var(--accent-purple); color: white;" onclick="addToLib('search')">حفظ دائم</button>
-                <button class="side-btn" style="flex:1; background: var(--accent-red); color: white;" onclick="addToLib('filter')">إضافة حصر</button>
-            </div>
+            <input type="text" id="tagInput" class="side-input" placeholder="إضافة كلمة جديدة...">
+            <button class="side-btn" style="background: var(--accent-purple);" onclick="addToLib('search')">حفظ للبحث</button>
+            <button class="side-btn" style="background: var(--accent-red);" onclick="addToLib('filter')">حفظ للحصر</button>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header-title">
-            <h1>Triggers Finding</h1>
-            <p>POWERED BY AL3MFALEH</p>
+            <h1>Triggers Finding BY AL3MFALEH</h1>
+            <div class="by-name">BY AL3MFALEH</div>
         </div>
+
         <div class="search-section">
             <div id="activeTags" class="tags-area"></div>
-            <input type="text" id="liveSearch" class="main-input" placeholder="...بحث يدوي مباشر داخل الأكواد" oninput="applyFilters()">
+            <input type="text" id="liveSearch" class="main-input" placeholder="اكتب للبحث السريع في النتائج المفتوحة..." oninput="applyFilters()">
         </div>
+
         <button class="btn-upload-main" onclick="document.getElementById('folderInput').click()">
-            <i class="fas fa-folder-open"></i> إضغط هنا لرفع مجلد السكربتات والبدء بالفحص
+            <i class="fas fa-folder-open"></i> رفع ملفات  (AL3MFALEH ENGINE)
         </button>
         <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="processFiles(this.files)">
 
         <div class="tabs-container">
-            <button class="tab-btn active" onclick="showTab('all', this)">تريجرات (<span id="c-all">0</span>)</button>
-            <button class="tab-btn" onclick="showTab('saved', this)">مستخرج (<span id="c-saved">0</span>)</button>
+            <button class="tab-btn active" onclick="showTab('all', this)">الكل (<span id="c-all">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('server', this)">Server (<span id="c-server">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('tclient', this)">Trig. Client (<span id="c-tclient">0</span>)</button>
+            <button class="tab-btn" onclick="showTab('tevent', this)">Trig. Event (<span id="c-tevent">0</span>)</button>
             <button class="tab-btn" onclick="showTab('coords', this)">إحداثيات (<span id="c-coords">0</span>)</button>
             <button class="tab-btn" onclick="showTab('hooks', this)">ويبهوك (<span id="c-hooks">0</span>)</button>
         </div>
 
         <div class="display-area">
             <textarea id="txt-all" class="active" readonly></textarea>
-            <textarea id="txt-saved" readonly></textarea>
+            <textarea id="txt-server" readonly></textarea>
+            <textarea id="txt-tclient" readonly></textarea>
+            <textarea id="txt-tevent" readonly></textarea>
             <textarea id="txt-coords" readonly></textarea>
             <textarea id="txt-hooks" readonly></textarea>
         </div>
 
         <div class="bottom-bar">
             <div class="actions-row">
-                <input type="text" id="serverName" class="bottom-input" placeholder="...اكتب اسم السيرفر هنا">
-                <button class="btn-bottom btn-webhook" onclick="setWebhook()">الويب هوك <i class="fas fa-cog"></i></button>
-                <button class="btn-bottom btn-discord-file" onclick="sendFileToDiscord()">إرسال ملف <i class="fas fa-file-export"></i></button>
+                <input type="text" id="serverName" class="side-input" placeholder="أدخل اسم السيرفر لتسمية الملف..." style="flex:1">
+                <button class="btn-action" style="background:var(--accent-blue);" onclick="setWebhook()">إعدادات الويب هوك <i class="fas fa-cog"></i></button>
+                <button class="btn-action" style="background:var(--accent-pink);" onclick="sendToDiscord('tab')">إرسال التبويب <i class="fab fa-discord"></i></button>
+                <button class="btn-action" style="background:var(--accent-gold); color: #000;" onclick="sendToDiscord('full')">تقرير AL3MFALEH الشامل <i class="fas fa-file-export"></i></button>
             </div>
-            <div class="copyright">جميع الحقوق محفوظة © 2026 | AL3MFALEH</div>
+            <div class="copy-tag">AL3MFALEH © 2026 | All Rights Reserved</div>
         </div>
     </div>
 
 <script>
-    let rawData = { all: [], coords: [], hooks: [] };
+    // نظام استعادة البيانات الذكي
+    function getStoredData(keyBase) {
+        let merged = new Set();
+        ['V10', 'V11', 'V12', 'V13', 'V14'].forEach(v => {
+            let data = JSON.parse(localStorage.getItem(keyBase + v) || '[]');
+            data.forEach(item => merged.add(item));
+        });
+        return Array.from(merged);
+    }
+
+    let rawData = { all: [], server: [], tclient: [], tevent: [], coords: [], hooks: [] };
+    let filteredData = { all: [], server: [], tclient: [], tevent: [], coords: [], hooks: [] };
     let currentTab = 'all';
-    let lib = { search: JSON.parse(localStorage.getItem('L_S_V10') || '[]'), filter: JSON.parse(localStorage.getItem('L_F_V10') || '[]') };
+    let lib = { search: getStoredData('L_S_'), filter: getStoredData('L_F_') };
     let activeTags = { search: [], filter: [] };
 
     window.onload = renderLibs;
 
-    function setWebhook() {
-        let current = localStorage.getItem('SAVED_WEBHOOK_URL') || "";
-        let url = prompt("أدخل رابط الويب هوك:", current);
-        if (url !== null) {
-            if (url.includes("discord.com/api/webhooks")) {
-                localStorage.setItem('SAVED_WEBHOOK_URL', url);
-                alert("✅ تم الحفظ.");
-            } else { alert("❌ رابط غير صالح."); }
-        }
+    function syncStorage() {
+        localStorage.setItem('L_S_V14', JSON.stringify(lib.search));
+        localStorage.setItem('L_F_V14', JSON.stringify(lib.filter));
     }
 
-    async function sendFileToDiscord() {
-        let url = localStorage.getItem('SAVED_WEBHOOK_URL');
+    function setWebhook() {
+        let url = prompt("أدخل رابط الويب هوك الخاص بك:", localStorage.getItem('MASTER_WEBHOOK_URL') || "");
+        if (url) { localStorage.setItem('MASTER_WEBHOOK_URL', url); alert("✅ تم حفظ الويب هوك."); }
+    }
+
+    async function sendToDiscord(mode) {
+        let url = localStorage.getItem('MASTER_WEBHOOK_URL');
         if (!url) return setWebhook();
-        const server = document.getElementById('serverName').value || "غير محدد";
-        const content = document.getElementById(`txt-${currentTab}`).value;
-        if(!content) return alert("لا توجد نتائج!");
-        const fileContent = `التقرير: ${currentTab.toUpperCase()}\nالسيرفر: ${server}\n\n${content}`;
-        const blob = new Blob([fileContent], { type: 'text/plain' });
+        const sName = document.getElementById('serverName').value || "غير معروف";
+        let finalContent = "";
+        let reportTitle = "";
+
+        if (mode === 'tab') {
+            finalContent = document.getElementById(`txt-${currentTab}`).value;
+            reportTitle = `تقرير قسم: ${currentTab.toUpperCase()}`;
+        } else {
+            finalContent = `=== تقرير استخراج شامل | بواسطة AL3MFALEH ===\nالسيرفر: ${sName}\nالتاريخ: ${new Date().toLocaleString()}\n\n`;
+            ['server', 'tclient', 'tevent', 'coords', 'hooks'].forEach(k => {
+                if (filteredData[k].length > 0) {
+                    finalContent += `\n[--- قسم ${k.toUpperCase()} ---]\n` + filteredData[k].map(i => `${i.text}\n[Path: ${i.path}]`).join('\n---\n') + `\n`;
+                }
+            });
+            reportTitle = "التقرير الشامل الكامل";
+        }
+
+        if (!finalContent.trim() || finalContent.length < 10) return alert("❌ لا توجد بيانات كافية لإرسالها!");
+
+        const blob = new Blob([finalContent], { type: 'text/plain' });
         const formData = new FormData();
-        formData.append('file', blob, `Report_${server}.txt`);
+        formData.append('file', blob, `${mode}_AL3MFALEH_${sName}.txt`);
+        formData.append('payload_json', JSON.stringify({
+            content: `🛡️ **${reportTitle}**\n👤 **المستخرج:** AL3MFALEH\n📍 **السيرفر:** ${sName}`
+        }));
+
         try {
             await fetch(url, { method: 'POST', body: formData });
-            alert("✅ تم إرسال الملف بنجاح!");
-        } catch(e) { alert("❌ خطأ في الإرسال."); }
+            alert("✅ تم إرسال التقرير بنجاح للديسكورد!");
+        } catch (e) { alert("❌ خطأ في الإرسال."); }
     }
 
     function extractTriggersSmart(fullText, path) {
-        const triggers = [];
-        const pattern = /(TriggerServerEvent|TriggerClientEvent)\s*\(/g;
+        const results = { all: [], server: [], tclient: [], tevent: [] };
+        const pattern = /(TriggerServerEvent|TriggerClientEvent|TriggerEvent)\s*\(/g;
         let match;
         while ((match = pattern.exec(fullText)) !== null) {
+            let func = match[1];
+            let type = (func === "TriggerServerEvent") ? "server" : (func === "TriggerClientEvent" ? "tclient" : "tevent");
             let startIdx = match.index;
             let bracketCount = 0, result = "", foundStart = false;
             for (let i = startIdx; i < fullText.length; i++) {
@@ -155,107 +198,52 @@
                 if (char === '(') { bracketCount++; foundStart = true; }
                 else if (char === ')') { bracketCount--; }
                 if (foundStart && bracketCount === 0) {
-                    let cleanedText = result.replace(/\s+/g, ' ').trim();
-                    triggers.push({ text: cleanedText, path: path });
+                    let cleanText = result.replace(/\s+/g, ' ').trim();
+                    results.all.push({ text: cleanText, path: path });
+                    results[type].push({ text: cleanText, path: path });
                     break;
                 }
-                if (i - startIdx > 2000) break; 
+                if (i - startIdx > 1200) break;
             }
         }
-        return triggers;
+        return results;
     }
 
     async function processFiles(files) {
-        rawData = { all: [], coords: [], hooks: [] };
-        let uniqueHooks = new Set(); // لضمان عدم تكرار الويبهوكات
-        
+        rawData = { all: [], server: [], tclient: [], tevent: [], coords: [], hooks: [] };
         for (const file of files) {
             if (file.name.endsWith('.lua') || file.name.endsWith('.js')) {
                 const text = await file.text();
                 const path = file.webkitRelativePath;
-
-                // استخراج التريجرات
-                rawData.all.push(...extractTriggersSmart(text, path));
-
-                // استخراج الويبهوكات (تصفية التكرار هنا)
-                const hooksFound = text.match(/https:\/\/discord\.com\/api\/webhooks\/[0-9]+\/[A-Za-z0-9._-]+/g);
-                if (hooksFound) {
-                    hooksFound.forEach(h => {
-                        if (!uniqueHooks.has(h)) {
-                            uniqueHooks.add(h);
-                            rawData.hooks.push({ text: h, path: path });
-                        }
-                    });
-                }
-
-                // استخراج الإحداثيات
-                const lines = text.split('\n');
-                lines.forEach(line => {
-                    const t = line.trim();
-                    if (t.match(/vector[34]\s*\(/)) rawData.coords.push({ text: t, path: path });
-                });
+                const triggers = extractTriggersSmart(text, path);
+                rawData.all.push(...triggers.all);
+                rawData.server.push(...triggers.server);
+                rawData.tclient.push(...triggers.tclient);
+                rawData.tevent.push(...triggers.tevent);
+                const hooks = text.match(/https:\/\/discord\.com\/api\/webhooks\/[0-9]+\/[A-Za-z0-9._-]+/g);
+                if (hooks) hooks.forEach(h => rawData.hooks.push({ text: h, path: path }));
+                text.split('\n').forEach(line => { if (line.trim().match(/vector[34]\s*\(/)) rawData.coords.push({ text: line.trim(), path: path }); });
             }
         }
         applyFilters();
-        alert("تم الفحص بنجاح!");
+        alert("✅ AL3MFALEH Scout: تم الانتهاء من الفحص بنجاح.");
     }
 
-    // دوال الفلترة المساعدة (بقيت كما هي)
-    function addToLib(type) {
-        const val = document.getElementById('tagInput').value.trim();
-        if (val && !lib[type].includes(val)) {
-            lib[type].push(val);
-            localStorage.setItem('L_' + (type==='search'?'S_V10':'F_V10'), JSON.stringify(lib[type]));
-            document.getElementById('tagInput').value = '';
-            renderLibs();
-        }
-    }
-    function activateTag(type, val) {
-        if (!activeTags[type].includes(val)) {
-            activeTags[type].push(val);
-            renderActiveTags();
-            applyFilters();
-        }
-    }
-    function renderLibs() {
-        ['search', 'filter'].forEach(t => {
-            document.getElementById(t === 'search' ? 'libSearch' : 'libFilter').innerHTML = lib[t].map(w => `
-                <div class="lib-item" onclick="activateTag('${t}', '${w}')">
-                    <i class="fas fa-times" style="color:#ff4c4c" onclick="event.stopPropagation(); deleteFromLib('${w}', '${t}')"></i>
-                    <span>${w}</span>
-                </div>
-            `).join('');
-        });
-    }
-    function deleteFromLib(word, type) {
-        lib[type] = lib[type].filter(x => x !== word);
-        localStorage.setItem('L_' + (type==='search'?'S_V10':'F_V10'), JSON.stringify(lib[type]));
-        renderLibs();
-    }
-    function renderActiveTags() {
-        let h = '';
-        activeTags.search.forEach(v => h += `<div class="tag-blue">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'search')"></i></div>`);
-        activeTags.filter.forEach(v => h += `<div class="tag-red">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'filter')"></i></div>`);
-        document.getElementById('activeTags').innerHTML = h;
-    }
-    function removeActiveTag(v, type) {
-        activeTags[type] = activeTags[type].filter(x => x !== v);
-        renderActiveTags();
-        applyFilters();
-    }
     function applyFilters() {
         const query = document.getElementById('liveSearch').value.toLowerCase();
-        const fAll = rawData.all.filter(i => !activeTags.filter.some(t => i.text.toLowerCase().includes(t.toLowerCase())) && i.text.toLowerCase().includes(query));
-        const fSaved = [...rawData.all, ...rawData.coords].filter(i => activeTags.search.some(t => i.text.toLowerCase().includes(t.toLowerCase())) && i.text.toLowerCase().includes(query));
-        updateArea('all', fAll);
-        updateArea('saved', fSaved);
-        updateArea('coords', rawData.coords.filter(i => i.text.toLowerCase().includes(query)));
-        updateArea('hooks', rawData.hooks.filter(i => i.text.toLowerCase().includes(query)));
+        const filterFn = item => {
+            const text = item.text.toLowerCase();
+            if (activeTags.filter.some(t => text.includes(t.toLowerCase()))) return false;
+            const matchesTags = activeTags.search.length === 0 || activeTags.search.some(t => text.includes(t.toLowerCase()));
+            return matchesTags && text.includes(query);
+        };
+        ['all', 'server', 'tclient', 'tevent', 'coords', 'hooks'].forEach(k => {
+            filteredData[k] = rawData[k].filter(filterFn);
+            document.getElementById(`txt-${k}`).value = filteredData[k].map(i => `${i.text}\n-- [📂 ${i.path}]\n---`).join('\n');
+            document.getElementById(`c-${k}`).innerText = filteredData[k].length;
+        });
     }
-    function updateArea(id, data) {
-        document.getElementById(`txt-${id}`).value = data.map(i => `${i.text}\n-- [${i.path}]\n---`).join('\n');
-        document.getElementById(`c-${id}`).innerText = data.length;
-    }
+
     function showTab(type, btn) {
         currentTab = type;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -263,6 +251,29 @@
         document.querySelectorAll('textarea').forEach(t => t.classList.remove('active'));
         document.getElementById(`txt-${type}`).classList.add('active');
     }
+
+    function addToLib(type) {
+        const val = document.getElementById('tagInput').value.trim();
+        if (val && !lib[type].includes(val)) {
+            lib[type].push(val);
+            syncStorage();
+            document.getElementById('tagInput').value = '';
+            renderLibs();
+        }
+    }
+    function activateTag(type, val) { if (!activeTags[type].includes(val)) { activeTags[type].push(val); renderActiveTags(); applyFilters(); } }
+    function removeActiveTag(v, type) { activeTags[type] = activeTags[type].filter(x => x !== v); renderActiveTags(); applyFilters(); }
+    function renderActiveTags() {
+        let h = '';
+        activeTags.search.forEach(v => h += `<div class="tag-active">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'search')"></i></div>`);
+        activeTags.filter.forEach(v => h += `<div class="tag-filter">${v} <i class="fas fa-times" onclick="removeActiveTag('${v}', 'filter')"></i></div>`);
+        document.getElementById('activeTags').innerHTML = h;
+    }
+    function renderLibs() {
+        document.getElementById('libSearch').innerHTML = lib.search.map(w => `<div class="lib-item" onclick="activateTag('search', '${w}')"><span>${w}</span><i class="fas fa-trash" style="color:var(--accent-red)" onclick="event.stopPropagation(); deleteFromLib('${w}', 'search')"></i></div>`).join('');
+        document.getElementById('libFilter').innerHTML = lib.filter.map(w => `<div class="lib-item" onclick="activateTag('filter', '${w}')"><span>${w}</span><i class="fas fa-trash" style="color:var(--accent-red)" onclick="event.stopPropagation(); deleteFromLib('${w}', 'filter')"></i></div>`).join('');
+    }
+    function deleteFromLib(word, type) { lib[type] = lib[type].filter(x => x !== word); syncStorage(); renderLibs(); }
 </script>
 </body>
 </html>
